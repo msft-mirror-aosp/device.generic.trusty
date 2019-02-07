@@ -19,28 +19,34 @@
 # same as running under the Android emulator.
 
 PRODUCT_PACKAGES += \
+    adb \
+    adbd \
     android.hidl.allocator@1.0-service \
+    apexd \
+    dhcpclient \
+    hwservicemanager \
     init \
     init_system \
     init_vendor \
     init.environ.rc \
     init.rc \
+    libc.bootstrap \
+    libdl.bootstrap \
+    libm.bootstrap \
     linker \
     linker64 \
     logcat \
     logd \
     logwrapper \
+    mdnsd \
+    reboot \
     servicemanager \
-    hwservicemanager \
-    vndservicemanager \
     sh \
+    su \
     toolbox \
     toybox \
+    vndservicemanager \
     vold \
-    reboot \
-    adbd \
-    dhcpclient \
-    mdnsd \
 
 # SELinux packages are added as dependencies of the selinux_policy
 # phony package.
@@ -70,4 +76,18 @@ $(call inherit-product, system/core/trusty/trusty-storage.mk)
 PRODUCT_PACKAGES += \
     tipc-test \
     trusty-ut-ctrl \
+
+PRODUCT_BOOT_JARS := \
+    core-oj \
+    core-libart \
+    conscrypt \
+    okhttp \
+    bouncycastle \
+    apache-xml \
+    ext \
+    framework \
+    telephony-common \
+    voip-common \
+    ims-common \
+    android.test.base \
 
