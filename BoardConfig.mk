@@ -36,8 +36,8 @@ TARGET_USES_64_BIT_BINDER := true
 BUILD_QEMU_IMAGES := true
 
 TARGET_USERIMAGES_USE_EXT4 := true
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 67108864 # 64M
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 4194304 # 4M
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 268435456 # 256M
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 67108864 # 64M
 TARGET_COPY_OUT_VENDOR := vendor
 # ~100 MB vendor image. Please adjust system image / vendor image sizes
 # when finalizing them.
@@ -53,3 +53,6 @@ BOARD_SEPOLICY_DIRS += build/target/board/generic/sepolicy
 # Enable A/B update
 TARGET_NO_RECOVERY := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
+
+# Specify HALs
+DEVICE_MANIFEST_FILE := device/generic/trusty/manifest.xml

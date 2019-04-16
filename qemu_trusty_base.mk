@@ -19,11 +19,12 @@
 # same as running under the Android emulator.
 
 PRODUCT_PACKAGES += \
-    adb \
     adbd \
     android.hidl.allocator@1.0-service \
     apexd \
+    com.android.runtime \
     dhcpclient \
+    gatekeeperd \
     hwservicemanager \
     init \
     init_system \
@@ -53,6 +54,15 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     selinux_policy \
 
+PRODUCT_HOST_PACKAGES += \
+    adb \
+    e2fsdroid \
+    make_f2fs \
+    mdnsd \
+    mke2fs \
+    sload_f2fs \
+    toybox \
+
 PRODUCT_COPY_FILES += \
     system/core/rootdir/init.usb.rc:root/init.usb.rc \
     system/core/rootdir/init.usb.configfs.rc:root/init.usb.configfs.rc \
@@ -64,6 +74,7 @@ PRODUCT_FULL_TREBLE_OVERRIDE := true
 PRODUCT_COPY_FILES += \
     device/generic/qemu/fstab.ranchu:root/fstab.qemu_trusty \
     device/generic/trusty/init.qemu_trusty.rc:root/init.qemu_trusty.rc \
+    device/generic/trusty/ueventd.qemu_trusty.rc:root/ueventd.qemu_trusty.rc \
 
 PRODUCT_COPY_FILES += \
     device/generic/goldfish/data/etc/config.ini:config.ini \
@@ -73,9 +84,13 @@ PRODUCT_COPY_FILES += \
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 
+# Test Utilities
 PRODUCT_PACKAGES += \
     tipc-test \
     trusty-ut-ctrl \
+    VtsHalGatekeeperV1_0TargetTest \
+    VtsHalKeymasterV3_0TargetTest \
+    VtsHalKeymasterV4_0TargetTest \
 
 PRODUCT_BOOT_JARS := \
     core-oj \
