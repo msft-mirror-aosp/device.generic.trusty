@@ -21,9 +21,12 @@
 PRODUCT_PACKAGES += \
     adbd \
     android.hidl.allocator@1.0-service \
+    system_manifest.xml \
+    framework_manifest.xml \
     apexd \
     com.android.runtime \
     dhcpclient \
+    gatekeeperd \
     hwservicemanager \
     init \
     init_system \
@@ -55,12 +58,10 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_HOST_PACKAGES += \
     adb \
-    adbd \
     e2fsdroid \
     make_f2fs \
     mdnsd \
     mke2fs \
-    selinux_policy \
     sload_f2fs \
     toybox \
 
@@ -76,6 +77,7 @@ PRODUCT_COPY_FILES += \
     device/generic/qemu/fstab.ranchu:root/fstab.qemu_trusty \
     device/generic/trusty/init.qemu_trusty.rc:root/init.qemu_trusty.rc \
     device/generic/trusty/ueventd.qemu_trusty.rc:root/ueventd.qemu_trusty.rc \
+    device/generic/goldfish/compatibility_matrix.xml:vendor/compatibility_matrix.xml
 
 PRODUCT_COPY_FILES += \
     device/generic/goldfish/data/etc/config.ini:config.ini \
@@ -85,9 +87,13 @@ PRODUCT_COPY_FILES += \
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 
+# Test Utilities
 PRODUCT_PACKAGES += \
     tipc-test \
     trusty-ut-ctrl \
+    VtsHalGatekeeperV1_0TargetTest \
+    VtsHalKeymasterV3_0TargetTest \
+    VtsHalKeymasterV4_0TargetTest \
 
 PRODUCT_BOOT_JARS := \
     core-oj \
