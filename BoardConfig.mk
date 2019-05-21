@@ -33,10 +33,13 @@ BOARD_SEPOLICY_DIRS += device/generic/trusty/sepolicy
 
 TARGET_USES_64_BIT_BINDER := true
 
-BUILD_QEMU_IMAGES := true
+# We want goldfish build configuration information, but not the resulting
+# QEMU images. QEMU_CUSTOMIZATIONS turns this on without building the images
+# like BUILD_QEMU_IMAGES would imply.
+QEMU_CUSTOMIZATIONS := true
 
 TARGET_USERIMAGES_USE_EXT4 := true
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 268435456 # 256M
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 536870912 # 512M
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 67108864 # 64M
 TARGET_COPY_OUT_VENDOR := vendor
 # ~100 MB vendor image. Please adjust system image / vendor image sizes
