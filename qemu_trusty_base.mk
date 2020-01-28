@@ -114,6 +114,7 @@ PRODUCT_BOOT_JARS := \
     apache-xml \
     ext \
     framework-minus-apex \
+    framework-tethering \
     telephony-common \
     voip-common \
     ims-common \
@@ -121,4 +122,5 @@ PRODUCT_BOOT_JARS := \
 
 PRODUCT_UPDATABLE_BOOT_JARS := \
     com.android.conscrypt:conscrypt \
+    com.android.tethering:framework-tethering \
 
