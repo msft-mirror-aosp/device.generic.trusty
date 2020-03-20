@@ -21,8 +21,6 @@
 PRODUCT_PACKAGES += \
     com.android.adbd \
     android.hidl.allocator@1.0-service \
-    system_manifest.xml \
-    framework_manifest.xml \
     apexd \
     com.android.art \
     com.android.i18n \
@@ -51,6 +49,13 @@ PRODUCT_PACKAGES += \
     toybox \
     vndservicemanager \
     vold \
+
+# VINTF stuff for system and vendor (no product / odm / system_ext / etc.)
+PRODUCT_PACKAGES += \
+    system_compatibility_matrix.xml \
+    system_manifest.xml \
+    vendor_compatibility_matrix.xml \
+    vendor_manifest.xml \
 
 # Ensure boringssl NIAP check won't reboot us
 PRODUCT_PACKAGES += \
@@ -82,7 +87,6 @@ PRODUCT_COPY_FILES += \
     device/generic/qemu/fstab.ranchu:root/fstab.qemu_trusty \
     device/generic/trusty/init.qemu_trusty.rc:root/init.qemu_trusty.rc \
     device/generic/trusty/ueventd.qemu_trusty.rc:root/ueventd.qemu_trusty.rc \
-    device/generic/goldfish/compatibility_matrix.xml:vendor/compatibility_matrix.xml
 
 PRODUCT_COPY_FILES += \
     device/generic/goldfish/data/etc/config.ini:config.ini \
@@ -101,17 +105,15 @@ PRODUCT_PACKAGES += \
     VtsHalKeymasterV4_0TargetTest \
 
 PRODUCT_BOOT_JARS := \
-    core-oj \
-    core-libart \
-    core-icu4j \
-    conscrypt \
-    okhttp \
-    bouncycastle \
-    apache-xml \
+    $(ART_APEX_JARS) \
     ext \
     framework-minus-apex \
     telephony-common \
     voip-common \
     ims-common \
     android.test.base \
+
+PRODUCT_UPDATABLE_BOOT_JARS := \
+    com.android.conscrypt:conscrypt \
+    com.android.tethering:framework-tethering \
 
