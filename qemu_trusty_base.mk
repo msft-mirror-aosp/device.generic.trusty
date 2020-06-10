@@ -18,6 +18,8 @@
 # it supports a few Android virtual devices. Note that this is _not_ the
 # same as running under the Android emulator.
 
+PRODUCT_SOONG_NAMESPACES += device/generic/goldfish
+
 PRODUCT_PACKAGES += \
     com.android.adbd \
     android.hardware.confirmationui@1.0-service.trusty \
@@ -86,13 +88,13 @@ PRODUCT_COPY_FILES += \
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
 PRODUCT_COPY_FILES += \
-    device/generic/qemu/fstab.ranchu:root/fstab.qemu_trusty \
+    device/generic/trusty/fstab.ranchu:root/fstab.qemu_trusty \
     device/generic/trusty/init.qemu_trusty.rc:root/init.qemu_trusty.rc \
     device/generic/trusty/ueventd.qemu_trusty.rc:root/ueventd.qemu_trusty.rc \
 
 PRODUCT_COPY_FILES += \
     device/generic/goldfish/data/etc/config.ini:config.ini \
-    device/generic/qemu/advancedFeatures.ini:advancedFeatures.ini \
+    device/generic/trusty/advancedFeatures.ini:advancedFeatures.ini \
 
 # for Trusty
 $(call inherit-product, system/core/trusty/trusty-base.mk)
@@ -110,6 +112,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_BOOT_JARS := \
     $(ART_APEX_JARS) \
     ext \
+    com.android.i18n:core-icu4j \
     framework-minus-apex \
     telephony-common \
     voip-common \
