@@ -62,6 +62,16 @@ PRODUCT_PACKAGES += \
     vendor_compatibility_matrix.xml \
     vendor_manifest.xml \
 
+# Devices that inherit from build/make/target/product/base.mk always have
+# /system/system_ext/etc/vintf/manifest.xml generated. And build-time VINTF
+# checks assume that. Since we don't inherit from base.mk, add the dependency
+# here manually.
+PRODUCT_PACKAGES += \
+    system_ext_manifest.xml \
+
+# Skip VINTF checks for kernel configs
+PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false
+
 # Ensure boringssl NIAP check won't reboot us
 PRODUCT_PACKAGES += \
     com.android.conscrypt \
@@ -100,6 +110,7 @@ PRODUCT_COPY_FILES += \
 # for Trusty
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
+$(call inherit-product, system/core/trusty/trusty-test.mk)
 
 # Test Utilities
 PRODUCT_PACKAGES += \
@@ -122,5 +133,7 @@ PRODUCT_BOOT_JARS := \
 
 PRODUCT_UPDATABLE_BOOT_JARS := \
     com.android.conscrypt:conscrypt \
+    com.android.os.statsd:framework-statsd \
+    com.android.wifi:framework-wifi \
     com.android.tethering:framework-tethering \
 
