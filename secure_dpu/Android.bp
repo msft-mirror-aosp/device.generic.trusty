@@ -24,9 +24,12 @@ cc_binary {
 
     shared_libs: [
         "libbase",
+        "libdmabufheap",
         "libtrusty",
         "libutils",
     ],
+
+    header_libs: ["secure_dpu_headers"],
 
     init_rc: ["securedpud.rc"],
 
