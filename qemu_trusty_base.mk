@@ -50,6 +50,7 @@ PRODUCT_PACKAGES += \
     logwrapper \
     mediaserver \
     mdnsd \
+    odsign \
     reboot \
     securedpud \
     servicemanager \
@@ -120,6 +121,7 @@ $(call inherit-product, system/core/trusty/trusty-test.mk)
 # Test Utilities
 PRODUCT_PACKAGES += \
     tipc-test \
+    libtrusty_metrics_test \
     trusty-ut-ctrl \
     VtsHalConfirmationUIV1_0TargetTest \
     VtsHalGatekeeperV1_0TargetTest \
