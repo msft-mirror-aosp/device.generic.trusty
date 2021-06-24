@@ -18,6 +18,9 @@
 # it supports a few Android virtual devices. Note that this is _not_ the
 # same as running under the Android emulator.
 
+$(call inherit-product, $(SRC_TARGET_DIR)/product/default_art_config.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
+
 PRODUCT_SOONG_NAMESPACES += device/generic/goldfish
 
 PRODUCT_PACKAGES += \
@@ -50,6 +53,7 @@ PRODUCT_PACKAGES += \
     logwrapper \
     mediaserver \
     mdnsd \
+    odsign \
     reboot \
     securedpud \
     servicemanager \
@@ -120,25 +124,9 @@ $(call inherit-product, system/core/trusty/trusty-test.mk)
 # Test Utilities
 PRODUCT_PACKAGES += \
     tipc-test \
+    libtrusty_metrics_test \
     trusty-ut-ctrl \
     VtsHalConfirmationUIV1_0TargetTest \
     VtsHalGatekeeperV1_0TargetTest \
     VtsHalKeymasterV3_0TargetTest \
     VtsHalKeymasterV4_0TargetTest \
-
-PRODUCT_BOOT_JARS := \
-    $(ART_APEX_JARS) \
-    ext \
-    com.android.i18n:core-icu4j \
-    framework-minus-apex \
-    telephony-common \
-    voip-common \
-    ims-common \
-    android.test.base \
-
-PRODUCT_UPDATABLE_BOOT_JARS := \
-    com.android.conscrypt:conscrypt \
-    com.android.os.statsd:framework-statsd \
-    com.android.wifi:framework-wifi \
-    com.android.tethering:framework-tethering \
-
