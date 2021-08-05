@@ -61,6 +61,7 @@ PRODUCT_PACKAGES += \
     su \
     toolbox \
     toybox \
+    vdc \
     vndservicemanager \
     vold \
 
