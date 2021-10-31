@@ -96,7 +96,6 @@ PRODUCT_HOST_PACKAGES += \
     adb \
     e2fsdroid \
     make_f2fs \
-    mdnsd \
     mke2fs \
     sload_f2fs \
     toybox \
