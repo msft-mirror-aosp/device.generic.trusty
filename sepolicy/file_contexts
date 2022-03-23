@@ -1,4 +1,5 @@
 /dev/trusty-ipc-dev0                 u:object_r:tee_device:s0
+/dev/trusty-log0                     u:object_r:logbuffer_device:s0
 /dev/vport3p1                        u:object_r:rpmb_virt_device:s0
 /dev/vport3p2                        u:object_r:spi_virt_device:s0
 /vendor/bin/dhcpclient               u:object_r:dhcpclient_exec:s0
