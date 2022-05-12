@@ -28,7 +28,7 @@ PRODUCT_PACKAGES += \
     adbd_system_api \
     android.hardware.confirmationui@1.0-service.trusty \
     android.hidl.allocator@1.0-service \
-    android.system.suspend@1.0-service \
+    android.system.suspend-service \
     apexd \
     cgroups.json \
     com.android.art \
