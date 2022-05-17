@@ -30,6 +30,7 @@ PRODUCT_PACKAGES += \
     android.hidl.allocator@1.0-service \
     android.system.suspend@1.0-service \
     apexd \
+    cgroups.json \
     com.android.art \
     com.android.i18n \
     com.android.runtime \
@@ -111,6 +112,7 @@ PRODUCT_COPY_FILES += \
     device/generic/trusty/fstab.ranchu:root/fstab.qemu_trusty \
     device/generic/trusty/init.qemu_trusty.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qemu_trusty.rc \
     device/generic/trusty/ueventd.qemu_trusty.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc \
+    device/generic/goldfish/task_profiles.json:$(TARGET_COPY_OUT_VENDOR)/etc/task_profiles.json \
 
 PRODUCT_COPY_FILES += \
     device/generic/goldfish/data/etc/config.ini:config.ini \
