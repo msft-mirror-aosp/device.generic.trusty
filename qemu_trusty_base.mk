@@ -41,6 +41,7 @@ PRODUCT_PACKAGES += \
     init_vendor \
     init.environ.rc \
     keymaster_soft_wrapped_attestation_keys.xml \
+    keystore2 \
     libandroid_servers \
     libc.bootstrap \
     libdl.bootstrap \
