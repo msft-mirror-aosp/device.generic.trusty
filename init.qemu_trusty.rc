@@ -111,4 +111,4 @@ service storageproxyd /vendor/bin/storageproxyd -d /dev/trusty-ipc-dev0 \
         -r /dev/vport3p1 -p /data/vendor/ss -t virt
     class main
     disabled
-    user root
+    user system
