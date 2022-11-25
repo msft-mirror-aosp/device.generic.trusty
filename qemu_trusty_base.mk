@@ -129,6 +129,7 @@ PRODUCT_PACKAGES += \
     tipc-test \
     libtrusty_metrics_test \
     trusty-ut-ctrl \
+    trusty_stats_test \
     VtsAidlKeyMintTargetTest \
     VtsHalConfirmationUIV1_0TargetTest \
     VtsHalGatekeeperV1_0TargetTest \
