@@ -127,7 +127,6 @@ $(call inherit-product, system/core/trusty/trusty-test.mk)
 # Test Utilities
 PRODUCT_PACKAGES += \
     tipc-test \
-    libtrusty_metrics_test \
     trusty-ut-ctrl \
     trusty_stats_test \
     VtsAidlKeyMintTargetTest \
