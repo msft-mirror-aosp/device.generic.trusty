@@ -49,7 +49,6 @@ PRODUCT_PACKAGES += \
     libm.bootstrap \
     linker \
     linker64 \
-    linkerconfig \
     logcat \
     logd \
     logwrapper \
