@@ -21,10 +21,13 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/default_art_config.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
+$(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
+
 PRODUCT_SOONG_NAMESPACES += device/generic/goldfish
 
 PRODUCT_PACKAGES += \
     com.android.adbd \
+    com.android.virt \
     adbd_system_api \
     android.hardware.confirmationui@1.0-service.trusty \
     android.hidl.allocator@1.0-service \
@@ -137,3 +140,6 @@ PRODUCT_PACKAGES += \
     VtsHalKeymasterV3_0TargetTest \
     VtsHalKeymasterV4_0TargetTest \
     VtsHalRemotelyProvisionedComponentTargetTest \
+
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    ro.adb.secure=0
