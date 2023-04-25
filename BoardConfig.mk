@@ -31,7 +31,6 @@ TARGET_2ND_CPU_VARIANT := generic
 
 BOARD_SEPOLICY_DIRS += device/generic/trusty/sepolicy
 
-TARGET_USES_64_BIT_BINDER := true
 
 # We want goldfish build configuration information, but not the resulting
 # QEMU images. QEMU_CUSTOMIZATIONS turns this on without building the images
