@@ -33,7 +33,9 @@ PRODUCT_PACKAGES += \
     cgroups.json \
     com.android.art \
     com.android.i18n \
+    com.android.os.statsd \
     com.android.runtime \
+    com.android.sdkext \
     dhcpclient \
     gatekeeperd \
     hwservicemanager \
