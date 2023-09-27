@@ -132,7 +132,6 @@ $(call inherit-product, system/core/trusty/trusty-test.mk)
 PRODUCT_PACKAGES += \
     binderRpcToTrustyTest \
     tipc-test \
-    trusty-coverage-controller \
     trusty-ut-ctrl \
     trusty_stats_test \
     VtsAidlKeyMintTargetTest \
