@@ -137,6 +137,7 @@ PRODUCT_PACKAGES += \
     trusty_stats_test \
     VtsAidlKeyMintTargetTest \
     VtsHalConfirmationUIV1_0TargetTest \
+    VtsHalGatekeeperTargetTest \
     VtsHalGatekeeperV1_0TargetTest \
     VtsHalKeymasterV3_0TargetTest \
     VtsHalKeymasterV4_0TargetTest \
