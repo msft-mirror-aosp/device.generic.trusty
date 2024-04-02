@@ -106,9 +106,9 @@ PRODUCT_HOST_PACKAGES += \
     sload_f2fs \
     toybox \
 
+PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
+
 PRODUCT_COPY_FILES += \
-    system/core/rootdir/init.usb.rc:system/etc/init/hw/init.usb.rc \
-    system/core/rootdir/init.usb.configfs.rc:system/etc/init/hw/init.usb.configfs.rc \
     system/core/rootdir/etc/hosts:system/etc/hosts \
 
 PRODUCT_FULL_TREBLE_OVERRIDE := true
@@ -137,6 +137,7 @@ PRODUCT_PACKAGES += \
     trusty_stats_test \
     VtsAidlKeyMintTargetTest \
     VtsHalConfirmationUIV1_0TargetTest \
+    VtsHalGatekeeperTargetTest \
     VtsHalGatekeeperV1_0TargetTest \
     VtsHalKeymasterV3_0TargetTest \
     VtsHalKeymasterV4_0TargetTest \
