@@ -40,6 +40,7 @@ PRODUCT_PACKAGES += \
     com.android.runtime \
     com.android.sdkext \
     dhcpclient \
+    etc_hosts \
     gatekeeperd \
     hwservicemanager \
     init_system \
@@ -107,9 +108,6 @@ PRODUCT_HOST_PACKAGES += \
     toybox \
 
 PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
-
-PRODUCT_COPY_FILES += \
-    system/core/rootdir/etc/hosts:system/etc/hosts \
 
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
