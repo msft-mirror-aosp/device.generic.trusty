@@ -21,10 +21,13 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/default_art_config.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
+$(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
+
 PRODUCT_SOONG_NAMESPACES += device/generic/goldfish
 
 PRODUCT_PACKAGES += \
     com.android.adbd \
+    com.android.virt \
     adbd_system_api \
     android.hardware.confirmationui@1.0-service.trusty \
     android.hidl.allocator@1.0-service \
@@ -33,8 +36,11 @@ PRODUCT_PACKAGES += \
     cgroups.json \
     com.android.art \
     com.android.i18n \
+    com.android.os.statsd \
     com.android.runtime \
+    com.android.sdkext \
     dhcpclient \
+    etc_hosts \
     gatekeeperd \
     hwservicemanager \
     init_system \
@@ -101,10 +107,7 @@ PRODUCT_HOST_PACKAGES += \
     sload_f2fs \
     toybox \
 
-PRODUCT_COPY_FILES += \
-    system/core/rootdir/init.usb.rc:system/etc/init/hw/init.usb.rc \
-    system/core/rootdir/init.usb.configfs.rc:system/etc/init/hw/init.usb.configfs.rc \
-    system/core/rootdir/etc/hosts:system/etc/hosts \
+PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
 
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
@@ -125,12 +128,18 @@ $(call inherit-product, system/core/trusty/trusty-test.mk)
 
 # Test Utilities
 PRODUCT_PACKAGES += \
+    binderRpcToTrustyTest \
     tipc-test \
-    libtrusty_metrics_test \
+    trusty-coverage-controller \
     trusty-ut-ctrl \
+    trusty_stats_test \
     VtsAidlKeyMintTargetTest \
     VtsHalConfirmationUIV1_0TargetTest \
+    VtsHalGatekeeperTargetTest \
     VtsHalGatekeeperV1_0TargetTest \
     VtsHalKeymasterV3_0TargetTest \
     VtsHalKeymasterV4_0TargetTest \
     VtsHalRemotelyProvisionedComponentTargetTest \
+
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    ro.adb.secure=0

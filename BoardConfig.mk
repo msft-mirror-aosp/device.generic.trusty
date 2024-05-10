@@ -31,7 +31,6 @@ TARGET_2ND_CPU_VARIANT := generic
 
 BOARD_SEPOLICY_DIRS += device/generic/trusty/sepolicy
 
-TARGET_USES_64_BIT_BINDER := true
 
 # We want goldfish build configuration information, but not the resulting
 # QEMU images. QEMU_CUSTOMIZATIONS turns this on without building the images
@@ -44,7 +43,7 @@ BOARD_USERDATAIMAGE_PARTITION_SIZE := 268435456 # 256M
 TARGET_COPY_OUT_VENDOR := vendor
 # ~100 MB vendor image. Please adjust system image / vendor image sizes
 # when finalizing them.
-BOARD_VENDORIMAGE_PARTITION_SIZE := 8388608 # 8M
+BOARD_VENDORIMAGE_PARTITION_SIZE := 67108864 # 64M
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_FLASH_BLOCK_SIZE := 512
 TARGET_USERIMAGES_SPARSE_EXT_DISABLED := true
