@@ -104,6 +104,7 @@ service fingerprintd /system/bin/fingerprintd
 service bugreport /system/bin/dumpstate -d -p
     class main
     disabled
+    user root
     oneshot
     keycodes 114 115 116
 
