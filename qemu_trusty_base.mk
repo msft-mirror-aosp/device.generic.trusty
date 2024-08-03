@@ -66,6 +66,7 @@ PRODUCT_PACKAGES += \
     servicemanager \
     sh \
     su \
+    system-build.prop \
     toolbox \
     toybox \
     vdc \
