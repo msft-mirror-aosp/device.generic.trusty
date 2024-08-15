@@ -37,6 +37,11 @@ BOARD_SEPOLICY_DIRS += device/generic/trusty/sepolicy
 # like BUILD_QEMU_IMAGES would imply.
 QEMU_CUSTOMIZATIONS := true
 
+# Include the ramdisk image into the target files because
+# the prebuilts in the Trusty manifest need it there.
+BOARD_IMG_USE_RAMDISK := true
+BOARD_RAMDISK_USE_LZ4 := true
+
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 536870912 # 512M
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 268435456 # 256M
