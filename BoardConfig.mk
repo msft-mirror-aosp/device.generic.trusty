@@ -41,6 +41,49 @@ QEMU_CUSTOMIZATIONS := true
 # the prebuilts in the Trusty manifest need it there.
 BOARD_IMG_USE_RAMDISK := true
 BOARD_RAMDISK_USE_LZ4 := true
+BOARD_USES_GENERIC_KERNEL_IMAGE := true
+
+TARGET_KERNEL_USE ?= 6.6
+TARGET_KERNEL_ARCH ?= $(TARGET_ARCH)
+
+# The list of modules strictly/only required either to reach second stage
+# init, OR for recovery. Do not use this list to workaround second stage
+# issues.
+VIRTUAL_DEVICE_MODULES_PATH ?= \
+    kernel/prebuilts/common-modules/virtual-device/$(TARGET_KERNEL_USE)/$(subst _,-,$(TARGET_KERNEL_ARCH))
+RAMDISK_VIRTUAL_DEVICE_MODULES := \
+    failover.ko \
+    net_failover.ko \
+    virtio_blk.ko \
+    virtio_console.ko \
+    virtio_mmio.ko \
+    virtio_net.ko \
+    virtio_pci.ko \
+
+# TODO(b/301606895): use kernel/prebuilts/common-modules/trusty when we have it
+TRUSTY_MODULES_PATH ?= \
+    kernel/prebuilts/$(TARGET_KERNEL_USE)/$(subst _,-,$(TARGET_KERNEL_ARCH))
+RAMDISK_TRUSTY_MODULES := \
+    trusty-core.ko \
+    trusty-ipc.ko \
+    trusty-log.ko \
+    trusty-test.ko \
+    trusty-virtio.ko \
+
+# TODO(b/301606895): the Trusty modules are optional for now because they
+# might not be in the AOSP tree yet; when they land, remove the $(wildcard)
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES := \
+    $(wildcard $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES))) \
+    $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES)) \
+
+# GKI >5.15 will have and require virtio_pci_legacy_dev.ko
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/virtio_pci_legacy_dev.ko)
+# GKI >5.10 will have and require virtio_pci_modern_dev.ko
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/virtio_pci_modern_dev.ko)
+# GKI >6.4 will have an required vmw_vsock_virtio_transport_common.ko and vsock.ko
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES += \
+    $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/vmw_vsock_virtio_transport_common.ko) \
+    $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/vsock.ko)
 
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 536870912 # 512M
