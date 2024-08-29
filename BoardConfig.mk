@@ -45,6 +45,16 @@ BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
 TARGET_KERNEL_USE ?= 6.6
 TARGET_KERNEL_ARCH ?= $(TARGET_ARCH)
+TARGET_KERNEL_PATH ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)/kernel-$(TARGET_KERNEL_USE)
+
+# Copy kernel image for use by emulator
+PRODUCT_COPY_FILES += $(TARGET_KERNEL_PATH):kernel
+
+# Distribute kernel image. Normally the kernel would be in boot.img,
+# but because we do not use a boot.img we need to dist the kernel image itself.
+ifneq ($(filter $(TARGET_PRODUCT), qemu_trusty_arm64),)
+$(call dist-for-goals, dist_files, $(PRODUCT_OUT)/kernel)
+endif
 
 # The list of modules strictly/only required either to reach second stage
 # init, OR for recovery. Do not use this list to workaround second stage
