@@ -72,9 +72,13 @@ RAMDISK_TRUSTY_MODULES := \
 
 # TODO(b/301606895): the Trusty modules are optional for now because they
 # might not be in the AOSP tree yet; when they land, remove the $(wildcard)
+#
+# Trusty modules should come after virtual device modules to preserve virtio
+# device numbering and /dev devices names, which we rely on for the rpmb and
+# test-runner virtio console ports.
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES := \
-    $(wildcard $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES))) \
     $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES)) \
+    $(wildcard $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES))) \
 
 # GKI >5.15 will have and require virtio_pci_legacy_dev.ko
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/virtio_pci_legacy_dev.ko)
