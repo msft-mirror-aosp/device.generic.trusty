@@ -66,6 +66,7 @@ PRODUCT_PACKAGES += \
     servicemanager \
     sh \
     su \
+    system-build.prop \
     toolbox \
     toybox \
     vdc \
@@ -112,7 +113,8 @@ PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
 PRODUCT_COPY_FILES += \
-    device/generic/trusty/fstab.ranchu:root/fstab.qemu_trusty \
+    device/generic/trusty/fstab.trusty:$(TARGET_COPY_OUT_RAMDISK)/fstab.qemu_trusty \
+    device/generic/trusty/fstab.trusty:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qemu_trusty \
     device/generic/trusty/init.qemu_trusty.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qemu_trusty.rc \
     device/generic/trusty/ueventd.qemu_trusty.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc \
     system/core/libprocessgroup/profiles/task_profiles.json:$(TARGET_COPY_OUT_VENDOR)/etc/task_profiles.json \
