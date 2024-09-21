@@ -64,6 +64,7 @@ RAMDISK_VIRTUAL_DEVICE_MODULES := \
 TRUSTY_MODULES_PATH ?= \
     kernel/prebuilts/common-modules/trusty/$(TARGET_KERNEL_USE)/$(subst _,-,$(TARGET_KERNEL_ARCH))
 RAMDISK_TRUSTY_MODULES := \
+    system_heap.ko \
     trusty-core.ko \
     trusty-ipc.ko \
     trusty-log.ko \
