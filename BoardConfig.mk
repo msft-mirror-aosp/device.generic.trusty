@@ -46,7 +46,6 @@ BOARD_USES_GENERIC_KERNEL_IMAGE := true
 TARGET_KERNEL_USE ?= 6.6
 TARGET_KERNEL_ARCH ?= $(TARGET_ARCH)
 TARGET_KERNEL_PATH ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)/kernel-$(TARGET_KERNEL_USE)
-SYSTEM_DLKM_SRC ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)
 
 # Copy kernel image for use by emulator
 PRODUCT_COPY_FILES += $(TARGET_KERNEL_PATH):kernel
@@ -86,8 +85,7 @@ RAMDISK_TRUSTY_MODULES := \
 # device numbering and /dev devices names, which we rely on for the rpmb and
 # test-runner virtio console ports.
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES := \
-    $(wildcard $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES))) \
-    $(wildcard $(patsubst %,$(SYSTEM_DLKM_SRC)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES))) \
+    $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES)) \
     $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES)) \
 
 # GKI >5.15 will have and require virtio_pci_legacy_dev.ko
