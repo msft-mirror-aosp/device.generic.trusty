@@ -64,13 +64,10 @@ VIRTUAL_DEVICE_MODULES_PATH ?= \
 RAMDISK_VIRTUAL_DEVICE_MODULES := \
     failover.ko \
     net_failover.ko \
-    virtio_mmio.ko \
-    virtio_net.ko \
-
-SYSTEM_DLKM_SRC ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)
-RAMDISK_SYSTEM_MODULES := \
     virtio_blk.ko \
     virtio_console.ko \
+    virtio_mmio.ko \
+    virtio_net.ko \
     virtio_pci.ko \
 
 # TODO(b/301606895): use kernel/prebuilts/common-modules/trusty when we have it
@@ -88,8 +85,7 @@ RAMDISK_TRUSTY_MODULES := \
 # device numbering and /dev devices names, which we rely on for the rpmb and
 # test-runner virtio console ports.
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES := \
-    $(wildcard $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES))) \
-    $(wildcard $(patsubst %,$(SYSTEM_DLKM_SRC)/%,$(RAMDISK_SYSTEM_MODULES))) \
+    $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES)) \
     $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES)) \
 
 # GKI >5.15 will have and require virtio_pci_legacy_dev.ko
