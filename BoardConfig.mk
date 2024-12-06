@@ -45,6 +45,16 @@ BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
 TARGET_KERNEL_USE ?= 6.6
 TARGET_KERNEL_ARCH ?= $(TARGET_ARCH)
+TARGET_KERNEL_PATH ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)/kernel-$(TARGET_KERNEL_USE)
+
+# Copy kernel image for use by emulator
+PRODUCT_COPY_FILES += $(TARGET_KERNEL_PATH):kernel
+
+# Distribute kernel image. Normally the kernel would be in boot.img,
+# but because we do not use a boot.img we need to dist the kernel image itself.
+ifneq ($(filter $(TARGET_PRODUCT), qemu_trusty_arm64),)
+$(call dist-for-goals, dist_files, $(PRODUCT_OUT)/kernel)
+endif
 
 # The list of modules strictly/only required either to reach second stage
 # init, OR for recovery. Do not use this list to workaround second stage
@@ -54,31 +64,33 @@ VIRTUAL_DEVICE_MODULES_PATH ?= \
 RAMDISK_VIRTUAL_DEVICE_MODULES := \
     failover.ko \
     net_failover.ko \
-    virtio_blk.ko \
-    virtio_console.ko \
     virtio_mmio.ko \
     virtio_net.ko \
+
+SYSTEM_DLKM_SRC ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)
+RAMDISK_SYSTEM_MODULES := \
+    virtio_blk.ko \
+    virtio_console.ko \
     virtio_pci.ko \
 
 # TODO(b/301606895): use kernel/prebuilts/common-modules/trusty when we have it
 TRUSTY_MODULES_PATH ?= \
-    kernel/prebuilts/$(TARGET_KERNEL_USE)/$(subst _,-,$(TARGET_KERNEL_ARCH))
+    kernel/prebuilts/common-modules/trusty/$(TARGET_KERNEL_USE)/$(subst _,-,$(TARGET_KERNEL_ARCH))
 RAMDISK_TRUSTY_MODULES := \
+    system_heap.ko \
     trusty-core.ko \
     trusty-ipc.ko \
     trusty-log.ko \
     trusty-test.ko \
     trusty-virtio.ko \
 
-# TODO(b/301606895): the Trusty modules are optional for now because they
-# might not be in the AOSP tree yet; when they land, remove the $(wildcard)
-#
 # Trusty modules should come after virtual device modules to preserve virtio
 # device numbering and /dev devices names, which we rely on for the rpmb and
 # test-runner virtio console ports.
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES := \
-    $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES)) \
-    $(wildcard $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES))) \
+    $(wildcard $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES))) \
+    $(wildcard $(patsubst %,$(SYSTEM_DLKM_SRC)/%,$(RAMDISK_SYSTEM_MODULES))) \
+    $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES)) \
 
 # GKI >5.15 will have and require virtio_pci_legacy_dev.ko
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/virtio_pci_legacy_dev.ko)
