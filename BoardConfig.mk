@@ -64,11 +64,16 @@ VIRTUAL_DEVICE_MODULES_PATH ?= \
 RAMDISK_VIRTUAL_DEVICE_MODULES := \
     failover.ko \
     net_failover.ko \
-    virtio_blk.ko \
-    virtio_console.ko \
     virtio_mmio.ko \
     virtio_net.ko \
+
+SYSTEM_DLKM_SRC ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)
+RAMDISK_SYSTEM_MODULES := \
+    virtio_blk.ko \
+    virtio_console.ko \
     virtio_pci.ko \
+    virtio_pci_legacy_dev.ko \
+    virtio_pci_modern_dev.ko \
 
 # TODO(b/301606895): use kernel/prebuilts/common-modules/trusty when we have it
 TRUSTY_MODULES_PATH ?= \
@@ -85,17 +90,19 @@ RAMDISK_TRUSTY_MODULES := \
 # device numbering and /dev devices names, which we rely on for the rpmb and
 # test-runner virtio console ports.
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES := \
-    $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES)) \
+    $(wildcard $(patsubst %,$(VIRTUAL_DEVICE_MODULES_PATH)/%,$(RAMDISK_VIRTUAL_DEVICE_MODULES))) \
+    $(wildcard $(patsubst %,$(SYSTEM_DLKM_SRC)/%,$(RAMDISK_SYSTEM_MODULES))) \
     $(patsubst %,$(TRUSTY_MODULES_PATH)/%,$(RAMDISK_TRUSTY_MODULES)) \
 
-# GKI >5.15 will have and require virtio_pci_legacy_dev.ko
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/virtio_pci_legacy_dev.ko)
-# GKI >5.10 will have and require virtio_pci_modern_dev.ko
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/virtio_pci_modern_dev.ko)
 # GKI >6.4 will have an required vmw_vsock_virtio_transport_common.ko and vsock.ko
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES += \
     $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/vmw_vsock_virtio_transport_common.ko) \
     $(wildcard $(VIRTUAL_DEVICE_MODULES_PATH)/vsock.ko)
+
+# The modules above should go into the vendor ramdisk,
+# but for some reason Soong considers it "generic ramdisk"
+BOARD_DO_NOT_STRIP_GENERIC_RAMDISK_MODULES := true
+BOARD_DO_NOT_STRIP_VENDOR_RAMDISK_MODULES := true
 
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 536870912 # 512M
