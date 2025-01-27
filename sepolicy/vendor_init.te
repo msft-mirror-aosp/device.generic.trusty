@@ -1,0 +1,4 @@
+# Allow vendor_init to read ro.vendor.persist.status
+# to process init.rc actions
+set_prop(vendor_init, vendor_persist_prop)
+allow vendor_init rpmb_virt_device:chr_file { open getattr };
