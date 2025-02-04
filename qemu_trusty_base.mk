@@ -125,6 +125,10 @@ PRODUCT_COPY_FILES += \
     device/generic/goldfish/data/etc/config.ini:config.ini \
     device/generic/trusty/advancedFeatures.ini:advancedFeatures.ini \
 
+# Set Vendor SPL to match platform
+# needed for properly provisioning keymint (HAL info)
+VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
+
 # for Trusty
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
