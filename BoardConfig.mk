@@ -121,6 +121,8 @@ TARGET_USERIMAGES_SPARSE_EXT_DISABLED := true
 
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
 BOARD_SEPOLICY_DIRS += build/target/board/generic/sepolicy
+BOARD_VENDOR_SEPOLICY_DIRS += device/generic/goldfish/sepolicy/vendor
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += device/generic/goldfish/sepolicy/system_ext/private
 
 # Enable A/B update
 TARGET_NO_RECOVERY := true
