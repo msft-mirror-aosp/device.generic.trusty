@@ -15,6 +15,9 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(LOCAL_PATH)/qemu_trusty_base.mk)
 
+# AVF
+$(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
+
 PRODUCT_NAME := qemu_trusty_arm64
 PRODUCT_DEVICE := trusty
 PRODUCT_BRAND := Android
