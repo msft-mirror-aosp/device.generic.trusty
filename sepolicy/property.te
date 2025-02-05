@@ -1,0 +1,5 @@
+# Trusty storage FS ready
+vendor_internal_prop(vendor_trusty_storage_prop)
+
+# This prop will be set to "mounted" after /mnt/vendor/persist mounts
+vendor_internal_prop(vendor_persist_prop)
