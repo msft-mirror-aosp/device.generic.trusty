@@ -112,6 +112,8 @@ PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
 
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
+PRODUCT_AVF_MICRODROID_GUEST_GKI_VERSION := android16_612
+
 PRODUCT_COPY_FILES += \
     device/generic/trusty/fstab.trusty:$(TARGET_COPY_OUT_RAMDISK)/fstab.qemu_trusty \
     device/generic/trusty/fstab.trusty:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qemu_trusty \
@@ -122,6 +124,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/generic/goldfish/data/etc/config.ini:config.ini \
     device/generic/trusty/advancedFeatures.ini:advancedFeatures.ini \
+
+# Set Vendor SPL to match platform
+# needed for properly provisioning keymint (HAL info)
+VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
 
 # for Trusty
 $(call inherit-product, system/core/trusty/trusty-base.mk)

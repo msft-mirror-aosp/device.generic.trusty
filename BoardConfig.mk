@@ -43,7 +43,7 @@ BOARD_IMG_USE_RAMDISK := true
 BOARD_RAMDISK_USE_LZ4 := true
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
-TARGET_KERNEL_USE ?= 6.6
+TARGET_KERNEL_USE ?= 6.12
 TARGET_KERNEL_ARCH ?= $(TARGET_ARCH)
 TARGET_KERNEL_PATH ?= kernel/prebuilts/$(TARGET_KERNEL_USE)/$(TARGET_KERNEL_ARCH)/kernel-$(TARGET_KERNEL_USE)
 
@@ -80,6 +80,10 @@ TRUSTY_MODULES_PATH ?= \
     kernel/prebuilts/common-modules/trusty/$(TARGET_KERNEL_USE)/$(subst _,-,$(TARGET_KERNEL_ARCH))
 RAMDISK_TRUSTY_MODULES := \
     system_heap.ko \
+    ffa-core.ko \
+    ffa-module.ko \
+    trusty-ffa.ko \
+    trusty-smc.ko \
     trusty-core.ko \
     trusty-ipc.ko \
     trusty-log.ko \
@@ -117,6 +121,8 @@ TARGET_USERIMAGES_SPARSE_EXT_DISABLED := true
 
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
 BOARD_SEPOLICY_DIRS += build/target/board/generic/sepolicy
+BOARD_VENDOR_SEPOLICY_DIRS += device/generic/goldfish/sepolicy/vendor
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += device/generic/goldfish/sepolicy/system_ext/private
 
 # Enable A/B update
 TARGET_NO_RECOVERY := true
