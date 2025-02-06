@@ -25,7 +25,11 @@ $(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk
 
 PRODUCT_SOONG_NAMESPACES += device/generic/goldfish
 
+# select minimal set of services from build/make/target/product/base_system.mk
 PRODUCT_PACKAGES += \
+    aconfigd-system \
+    adbd_system_api \
+    aflags \
     com.android.adbd \
     com.android.virt \
     adbd_system_api \
@@ -72,6 +76,7 @@ PRODUCT_PACKAGES += \
     vdc \
     vndservicemanager \
     vold \
+    sanitizer.libraries.txt \
 
 # VINTF stuff for system and vendor (no product / odm / system_ext / etc.)
 PRODUCT_PACKAGES += \
@@ -130,6 +135,8 @@ PRODUCT_COPY_FILES += \
 VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
 
 # for Trusty
+KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
+$(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/trusty-apex.mk)
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-test.mk)
@@ -150,4 +157,5 @@ PRODUCT_PACKAGES += \
     VtsHalRemotelyProvisionedComponentTargetTest \
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.adb.secure=0
+    ro.adb.secure=0 \
+    ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee.cpp \
