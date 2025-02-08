@@ -4,6 +4,16 @@ on fs
 on early-init
     mount debugfs debugfs /sys/kernel/debug mode=755
 
+# legacy cpp implementation - to be deprecated
+on post-fs && property:ro.boot.vendor.apex.com.android.hardware.keymint=\
+com.android.hardware.keymint.trusty_tee.cpp
+    enable vendor.keymint-service.trusty_tee.cpp
+
+# rust implementation
+on post-fs && property:ro.boot.vendor.apex.com.android.hardware.keymint=\
+com.android.hardware.keymint.trusty_tee
+    enable vendor.keymint-service.trusty_tee
+
 on post-fs
     # Ensure rpmb_virt_device is ready and start storageproxyd
     # (on-post-fs at the latest because vold
