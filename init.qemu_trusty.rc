@@ -4,16 +4,24 @@ on fs
 on early-init
     mount debugfs debugfs /sys/kernel/debug mode=755
 
+on post-fs
+    # Ensure rpmb_virt_device is ready and start storageproxyd
+    # (on-post-fs at the latest because vold
+    # needs secure storage for rollback protection
+    # of the data partition encryption key
+    wait /dev/vport3p1
+    start storageproxyd
+
 on post-fs-data
-# The storage proxy is a vendor binary, and so cannot access /data/ss
     mkdir /data/vendor/ss 700 system system
     mkdir /data/vendor/ss/persist 0770 system system
-    enable storageproxyd
+    restart storageproxyd
 
 on boot
+    write /dev/kmsg "boot_kpi: K - init.rc 'on boot'"
     chown root system /sys/power/wake_lock
     chown root system /sys/power/wake_unlock
-    setprop ro.radio.use-ppp no
+setprop ro.radio.use-ppp no
     setprop ro.build.product generic
     setprop ro.product.device generic
     setprop ro.hardware.audio.primary goldfish
@@ -108,8 +116,10 @@ service bugreport /system/bin/dumpstate -d -p
     oneshot
     keycodes 114 115 116
 
+# start storageproxyd when rpmb virtual port is ready
 service storageproxyd /vendor/bin/storageproxyd -d /dev/trusty-ipc-dev0 \
         -r /dev/vport3p1 -p /data/vendor/ss -t virt
-    class main
     disabled
     user system
+    group system
+    task_profiles MaxPerformance
