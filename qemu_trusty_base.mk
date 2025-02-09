@@ -85,6 +85,10 @@ PRODUCT_PACKAGES += \
     vendor_compatibility_matrix.xml \
     vendor_manifest.xml \
 
+# Creates metadata partition mount point under root for
+# the devices with metadata partition
+BOARD_USES_METADATA_PARTITION := true
+
 # Devices that inherit from build/make/target/product/base.mk always have
 # /system/system_ext/etc/vintf/manifest.xml generated. And build-time VINTF
 # checks assume that. Since we don't inherit from base.mk, add the dependency
