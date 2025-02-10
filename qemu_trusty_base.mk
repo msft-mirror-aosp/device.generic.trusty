@@ -85,6 +85,11 @@ PRODUCT_PACKAGES += \
     vendor_compatibility_matrix.xml \
     vendor_manifest.xml \
 
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+TARGET_COPY_OUT_SYSTEM_EXT := system/system_ext
+BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE :=
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += device/generic/trusty/sepolicy/system_ext/private
+
 # Creates metadata partition mount point under root for
 # the devices with metadata partition
 BOARD_USES_METADATA_PARTITION := true
@@ -140,6 +145,18 @@ VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
 
 # for Trusty
 KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
+ifeq ($(RELEASE_AVF_ENABLE_EARLY_VM),true)
+  # TODO(b/390206831): update to secure mode once Trusted HAL on virtio-msg can be enabled
+  # in nonsecure mode, the Trusty System VMs (e.g. Keymint) is standalone and
+  # uses local Trusted HAL services (HWCrypto/SecureStorage).
+  # in secure mode, the Trusty System VMs access the remote Trusted HAL services,
+  # and integrate AuthMgrFE.
+  # the TRUSTY_SYSTEM_VM make variable is used by the Trusty makefile to customise
+  # the content of the VM according to the desired secure/nonsecure mode.
+  TRUSTY_SYSTEM_VM ?= nonsecure
+
+endif
+
 $(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/trusty-apex.mk)
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
