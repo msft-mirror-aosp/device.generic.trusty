@@ -13,6 +13,12 @@ com.android.hardware.keymint.trusty_tee.cpp
 on post-fs && property:ro.boot.vendor.apex.com.android.hardware.keymint=\
 com.android.hardware.keymint.trusty_tee
     enable vendor.keymint-service.trusty_tee
+on early-init && property:ro.boot.vendor.apex.com.android.hardware.keymint=\
+com.android.hardware.keymint.trusty_system_vm
+    # Enable the Trusty Security VM
+    setprop trusty.security_vm.enabled 1
+    # Enable KeyMint that connects to the Trusty Security VM
+    setprop trusty.security_vm.keymint.enabled 1
 
 on post-fs
     # Ensure rpmb_virt_device is ready and start storageproxyd
