@@ -145,17 +145,15 @@ VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
 
 # for Trusty
 KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
-ifeq ($(RELEASE_AVF_ENABLE_EARLY_VM),true)
-  # TODO(b/390206831): update to secure mode once Trusted HAL on virtio-msg can be enabled
-  # in nonsecure mode, the Trusty System VMs (e.g. Keymint) is standalone and
-  # uses local Trusted HAL services (HWCrypto/SecureStorage).
-  # in secure mode, the Trusty System VMs access the remote Trusted HAL services,
-  # and integrate AuthMgrFE.
-  # the TRUSTY_SYSTEM_VM make variable is used by the Trusty makefile to customise
-  # the content of the VM according to the desired secure/nonsecure mode.
-  TRUSTY_SYSTEM_VM ?= nonsecure
-
+TRUSTY_KEYMINT_IMPL ?= rust
+# TODO(b/390206831): remove placeholder_trusted_hal when VM2TZ is supported
+TRUSTY_SYSTEM_VM ?= enabled_with_placeholder_trusted_hal
+ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
+    $(call soong_config_set_bool, trusty_system_vm, placeholder_trusted_hal, true)
 endif
+$(call soong_config_set_bool, trusty_system_vm, enabled, true)
+$(call soong_config_set, trusty_system_vm, buildtype, $(TARGET_BUILD_VARIANT))
+$(call inherit-product, packages/modules/Virtualization/guest/trusty/security_vm/security_vm.mk)
 
 $(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/trusty-apex.mk)
 $(call inherit-product, system/core/trusty/trusty-base.mk)

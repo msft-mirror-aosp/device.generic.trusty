@@ -16,5 +16,6 @@ ifeq ($(KEYMINT_HAL_VENDOR_APEX_SELECT),true)
 PRODUCT_PACKAGES += \
     com.android.hardware.keymint.trusty_tee.cpp \
     com.android.hardware.keymint.trusty_tee \
+    com.android.hardware.keymint.trusty_system_vm \
 
 endif
