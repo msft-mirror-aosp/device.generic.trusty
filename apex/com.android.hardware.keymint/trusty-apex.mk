@@ -1,4 +1,4 @@
-# Copyright (C) 2018 The Android Open Source Project
+# Copyright (C) 2025 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
-$(call inherit-product, $(LOCAL_PATH)/qemu_trusty_base.mk)
+ifeq ($(KEYMINT_HAL_VENDOR_APEX_SELECT),true)
+PRODUCT_PACKAGES += \
+    com.android.hardware.keymint.trusty_tee.cpp \
+    com.android.hardware.keymint.trusty_tee \
+    com.android.hardware.keymint.trusty_system_vm \
 
-# AVF
-$(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
-
-PRODUCT_NAME := qemu_trusty_arm64
-PRODUCT_DEVICE := trusty
-PRODUCT_BRAND := Android
-PRODUCT_MODEL := qemu-trusty-arm64
-
+endif
