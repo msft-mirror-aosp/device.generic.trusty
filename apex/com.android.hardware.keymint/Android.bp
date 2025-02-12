@@ -48,3 +48,12 @@ apex {
         "android.hardware.security.keymint-service.rust.trusty.xml",
     ],
 }
+
+apex {
+    name: "com.android.hardware.keymint.trusty_system_vm",
+    defaults: ["com.android.hardware.keymint.trusty.apex_defaults"],
+    prebuilts: [
+        // vintf fragments
+        "android.hardware.security.keymint-service.trusty_system_vm.xml",
+    ],
+}
