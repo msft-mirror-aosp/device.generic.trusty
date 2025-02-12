@@ -23,7 +23,9 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
 $(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
 
-PRODUCT_SOONG_NAMESPACES += device/generic/goldfish
+PRODUCT_SOONG_NAMESPACES += \
+	device/generic/goldfish \
+	device/generic/trusty \
 
 # select minimal set of services from build/make/target/product/base_system.mk
 PRODUCT_PACKAGES += \
