@@ -1,0 +1,34 @@
+# Copyright (C) 2025 The Android Open-Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+on post-fs
+    insmod /vendor/lib/modules/6.12/ffa-core.ko
+    insmod /vendor/lib/modules/6.12/ffa-module.ko
+    insmod /vendor/lib/modules/6.12/trusty-core.ko
+    insmod /vendor/lib/modules/6.12/trusty-ffa.ko
+    insmod /vendor/lib/modules/6.12/trusty-ipc.ko
+    insmod /vendor/lib/modules/6.12/trusty-virtio-polling.ko default_vq_check_period_ms=500
+    insmod /vendor/lib/modules/6.12/trusty-populate.ko
+
+on post-fs-data
+    # /data is mounted noexec on microdroid
+    mkdir /data/nativetest64 0771 shell shell
+    mount tmpfs tmpfs /data/nativetest64 noatime nosuid nodev rw size=1M
+    restorecon /data/nativetest64
+
+    # tipc-test is not executable on the vendor image
+    mkdir /data/nativetest64/vendor 0771 shell shell
+    mkdir /data/nativetest64/vendor/tipc-test 0771 shell shell
+    copy /vendor/nativetest64/vendor/tipc-test/tipc-test /data/nativetest64/vendor/tipc-test/tipc-test
+    chmod 755 /data/nativetest64/vendor/tipc-test/tipc-test
