@@ -1,0 +1,50 @@
+package {
+    default_applicable_licenses: ["device_generic_trusty_license"],
+}
+
+prebuilt_etc {
+    name: "microdroid_vendor_trusty_init_rc",
+    filename: "init.trusty_modules.rc",
+    src: "init.trusty_modules.rc",
+    relative_install_path: "init",
+    no_full_install: true, // avoid collision with system partition's init.rc
+}
+
+prebuilt_etc {
+    name: "microdroid_vendor_trusty_ueventd_rc",
+    filename: "ueventd.rc",
+    src: "ueventd.rc",
+    no_full_install: true, // avoid collision with system partition's ueventd.rc
+}
+
+android_filesystem {
+    name: "microdroid_vendor_trusty_image",
+    partition_name: "microdroid-vendor",
+    type: "ext4",
+    file_contexts: "file_contexts",
+    use_avb: true,
+    avb_private_key: ":avb_testkey_rsa4096",
+    mount_point: "vendor",
+    deps: [
+        "microdroid_vendor_trusty_init_rc",
+        "microdroid_vendor_trusty_modules-android16-6.12-arm64",
+        "microdroid_vendor_trusty_ueventd_rc",
+        "trusty-ut-ctrl",
+    ],
+
+    product_variables: {
+        debuggable: {
+            deps: [
+                "tipc-test",
+            ],
+        },
+    },
+}
+
+prebuilt_etc {
+    name: "microdroid_vendor_trusty",
+    src: ":microdroid_vendor_trusty_image",
+    relative_install_path: "avf/microdroid",
+    filename: "microdroid_vendor.img",
+    vendor: true,
+}
