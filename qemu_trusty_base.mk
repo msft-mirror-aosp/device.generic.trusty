@@ -66,6 +66,7 @@ PRODUCT_PACKAGES += \
     logwrapper \
     mediaserver \
     mdnsd \
+    microdroid_vendor_trusty \
     odsign \
     reboot \
     securedpud \
@@ -129,6 +130,7 @@ PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
 PRODUCT_AVF_MICRODROID_GUEST_GKI_VERSION := android16_612
+MICRODROID_VENDOR_IMAGE_MODULE := microdroid_vendor_trusty
 
 PRODUCT_COPY_FILES += \
     device/generic/trusty/fstab.trusty:$(TARGET_COPY_OUT_RAMDISK)/fstab.qemu_trusty \
