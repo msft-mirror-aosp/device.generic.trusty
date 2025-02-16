@@ -23,9 +23,15 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
 $(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
 
-PRODUCT_SOONG_NAMESPACES += device/generic/goldfish
+PRODUCT_SOONG_NAMESPACES += \
+	device/generic/goldfish \
+	device/generic/trusty \
 
+# select minimal set of services from build/make/target/product/base_system.mk
 PRODUCT_PACKAGES += \
+    aconfigd-system \
+    adbd_system_api \
+    aflags \
     com.android.adbd \
     com.android.virt \
     adbd_system_api \
@@ -72,6 +78,7 @@ PRODUCT_PACKAGES += \
     vdc \
     vndservicemanager \
     vold \
+    sanitizer.libraries.txt \
 
 # VINTF stuff for system and vendor (no product / odm / system_ext / etc.)
 PRODUCT_PACKAGES += \
@@ -79,6 +86,15 @@ PRODUCT_PACKAGES += \
     system_manifest.xml \
     vendor_compatibility_matrix.xml \
     vendor_manifest.xml \
+
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+TARGET_COPY_OUT_SYSTEM_EXT := system/system_ext
+BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE :=
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += device/generic/trusty/sepolicy/system_ext/private
+
+# Creates metadata partition mount point under root for
+# the devices with metadata partition
+BOARD_USES_METADATA_PARTITION := true
 
 # Devices that inherit from build/make/target/product/base.mk always have
 # /system/system_ext/etc/vintf/manifest.xml generated. And build-time VINTF
@@ -130,6 +146,18 @@ PRODUCT_COPY_FILES += \
 VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
 
 # for Trusty
+KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
+TRUSTY_KEYMINT_IMPL ?= rust
+# TODO(b/390206831): remove placeholder_trusted_hal when VM2TZ is supported
+TRUSTY_SYSTEM_VM ?= enabled_with_placeholder_trusted_hal
+ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
+    $(call soong_config_set_bool, trusty_system_vm, placeholder_trusted_hal, true)
+endif
+$(call soong_config_set_bool, trusty_system_vm, enabled, true)
+$(call soong_config_set, trusty_system_vm, buildtype, $(TARGET_BUILD_VARIANT))
+$(call inherit-product, packages/modules/Virtualization/guest/trusty/security_vm/security_vm.mk)
+
+$(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/trusty-apex.mk)
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-test.mk)
@@ -150,4 +178,5 @@ PRODUCT_PACKAGES += \
     VtsHalRemotelyProvisionedComponentTargetTest \
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.adb.secure=0
+    ro.adb.secure=0 \
+    ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee.cpp \

@@ -110,7 +110,7 @@ BOARD_DO_NOT_STRIP_VENDOR_RAMDISK_MODULES := true
 
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 536870912 # 512M
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 268435456 # 256M
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 536870912 # 512M (allows to store the ~100MB trusty_test_vm.elf)
 TARGET_COPY_OUT_VENDOR := vendor
 # ~100 MB vendor image. Please adjust system image / vendor image sizes
 # when finalizing them.
