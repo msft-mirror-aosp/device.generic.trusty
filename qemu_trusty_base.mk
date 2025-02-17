@@ -163,6 +163,7 @@ $(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-test.mk)
+$(call inherit-product-if-exists, trusty/vendor/google/proprietary/device/device.mk)
 
 # Test Utilities
 PRODUCT_PACKAGES += \
