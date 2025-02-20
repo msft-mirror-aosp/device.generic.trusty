@@ -189,4 +189,4 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.adb.secure=0 \
-    ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee.cpp \
+    ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee \
