@@ -39,6 +39,8 @@ PRODUCT_PACKAGES += \
     android.hidl.allocator@1.0-service \
     android.system.suspend-service \
     apexd \
+    atrace \
+    awk \
     cgroups.json \
     com.android.art \
     com.android.i18n \
@@ -68,14 +70,19 @@ PRODUCT_PACKAGES += \
     mdnsd \
     microdroid_vendor_trusty \
     odsign \
+    perfetto \
+    perfetto-extras \
     reboot \
     securedpud \
     servicemanager \
     sh \
     su \
+    strace \
     system-build.prop \
     toolbox \
     toybox \
+    traced \
+    traced_probes \
     vdc \
     vndservicemanager \
     vold \
@@ -182,4 +189,4 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.adb.secure=0 \
-    ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee.cpp \
+    ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee \
