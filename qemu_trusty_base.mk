@@ -39,6 +39,8 @@ PRODUCT_PACKAGES += \
     android.hidl.allocator@1.0-service \
     android.system.suspend-service \
     apexd \
+    atrace \
+    awk \
     cgroups.json \
     com.android.art \
     com.android.i18n \
@@ -66,15 +68,21 @@ PRODUCT_PACKAGES += \
     logwrapper \
     mediaserver \
     mdnsd \
+    microdroid_vendor_trusty \
     odsign \
+    perfetto \
+    perfetto-extras \
     reboot \
     securedpud \
     servicemanager \
     sh \
     su \
+    strace \
     system-build.prop \
     toolbox \
     toybox \
+    traced \
+    traced_probes \
     vdc \
     vndservicemanager \
     vold \
@@ -129,6 +137,7 @@ PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
 PRODUCT_AVF_MICRODROID_GUEST_GKI_VERSION := android16_612
+MICRODROID_VENDOR_IMAGE_MODULE := microdroid_vendor_trusty
 
 PRODUCT_COPY_FILES += \
     device/generic/trusty/fstab.trusty:$(TARGET_COPY_OUT_RAMDISK)/fstab.qemu_trusty \
@@ -161,6 +170,7 @@ $(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/
 $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-test.mk)
+$(call inherit-product-if-exists, trusty/vendor/google/proprietary/device/device.mk)
 
 # Test Utilities
 PRODUCT_PACKAGES += \
