@@ -164,6 +164,8 @@ ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
 endif
 $(call soong_config_set_bool, trusty_system_vm, enabled, true)
 $(call soong_config_set, trusty_system_vm, buildtype, $(TARGET_BUILD_VARIANT))
+$(call soong_config_set_bool, trusty_tee, enabled, true)
+
 $(call inherit-product, packages/modules/Virtualization/guest/trusty/security_vm/security_vm.mk)
 
 $(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/trusty-apex.mk)
