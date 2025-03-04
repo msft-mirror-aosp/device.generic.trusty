@@ -15,6 +15,11 @@ allow tee tee_data_file:lnk_file r_file_perms;
 # Handle wake locks
 wakelock_use(tee)
 
+binder_use(tee)
+allow tee fwk_vold_service:service_manager find;
+binder_call(tee, vold)
+binder_call(vold, tee)
+
 # Allow storageproxyd access to gsi_public_metadata_file
 read_fstab(tee)
 
