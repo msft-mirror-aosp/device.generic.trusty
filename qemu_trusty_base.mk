@@ -154,7 +154,26 @@ PRODUCT_COPY_FILES += \
 # needed for properly provisioning keymint (HAL info)
 VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
 
-# for Trusty
+##########################
+# Trusty VM/TEE products #
+##########################
+
+# TODO(b/393850980): enable TRUSTY_SYSTEM_VM_USE_PVMFW when
+# necessary dependencied are available on QEMU (e.g. ARM TRNG supported in TF-A)
+TRUSTY_SYSTEM_VM_USE_PVMFW := false
+ifeq ($(TRUSTY_SYSTEM_VM_USE_PVMFW),true)
+PRODUCT_PACKAGES += \
+      pvmfw_test_img.img \
+
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    hypervisor.pvmfw.path=/vendor/etc/pvmfw/pvmfw_test_img.img \
+
+else
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    hypervisor.pvmfw.path=none \
+
+endif
+
 KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
 TRUSTY_KEYMINT_IMPL ?= rust
 # TODO(b/390206831): remove placeholder_trusted_hal when VM2TZ is supported
@@ -164,6 +183,8 @@ ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
 endif
 $(call soong_config_set_bool, trusty_system_vm, enabled, true)
 $(call soong_config_set, trusty_system_vm, buildtype, $(TARGET_BUILD_VARIANT))
+$(call soong_config_set_bool, trusty_tee, enabled, true)
+
 $(call inherit-product, packages/modules/Virtualization/guest/trusty/security_vm/security_vm.mk)
 
 $(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/trusty-apex.mk)

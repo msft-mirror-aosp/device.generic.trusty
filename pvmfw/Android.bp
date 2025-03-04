@@ -1,0 +1,37 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+// Common defaults for pvmfw image generation.
+cc_genrule {
+    name: "pvmfw_test_img.gen",
+    tools: ["pvmfw-tool"],
+    enabled: false,
+    arch: {
+        arm64: {
+            srcs: [
+                ":pvmfw_bin",
+                ":test_avf_bcc_dat",
+            ],
+            enabled: true,
+        },
+    },
+    out: [
+        "pvmfw_test_img.img",
+    ],
+    cmd: "FILES=($(in)) && $(location pvmfw-tool) $(out) $${FILES[0]} $${FILES[1]}",
+}
+
+prebuilt_etc {
+    name: "pvmfw_test_img.img",
+    filename: "pvmfw_test_img.img",
+    relative_install_path: "pvmfw",
+    vendor: true,
+    target: {
+        android_arm64: {
+            src: ":pvmfw_test_img.gen",
+        },
+    },
+    src: ":empty_file",
+    installable: true,
+}
