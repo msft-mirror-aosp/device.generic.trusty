@@ -18,6 +18,9 @@ $(call inherit-product, $(LOCAL_PATH)/qemu_trusty_base.mk)
 # AVF
 $(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
 
+# PVMFW support
+PRODUCT_BUILD_PVMFW_IMAGE := true
+
 PRODUCT_NAME := qemu_trusty_arm64
 PRODUCT_DEVICE := trusty
 PRODUCT_BRAND := Android
