@@ -20,6 +20,7 @@ on post-fs
     insmod /vendor/lib/modules/6.12/trusty-ipc.ko
     insmod /vendor/lib/modules/6.12/trusty-virtio-polling.ko default_vq_check_period_ms=500
     insmod /vendor/lib/modules/6.12/trusty-populate.ko
+    insmod /vendor/lib/modules/6.12/system_heap.ko
 
 on post-fs-data
     # /data is mounted noexec on microdroid
