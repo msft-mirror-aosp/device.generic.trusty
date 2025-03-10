@@ -95,6 +95,7 @@ PRODUCT_PACKAGES += \
     system_manifest.xml \
     vendor_compatibility_matrix.xml \
     vendor_manifest.xml \
+    android.hardware.security.see.storage-service.trusty.xml \
 
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 TARGET_COPY_OUT_SYSTEM_EXT := system/system_ext
