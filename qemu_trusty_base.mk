@@ -134,6 +134,7 @@ PRODUCT_HOST_PACKAGES += \
     mke2fs \
     sload_f2fs \
     toybox \
+    trusty_metrics_atoms_protoc_plugin \
 
 PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
 
