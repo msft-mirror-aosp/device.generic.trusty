@@ -1,0 +1,6 @@
+prebuilt_etc {
+    name: "init.boot_status.rc",
+    system_ext_specific: true,
+    src: "init.boot_status.rc",
+    sub_dir: "init",
+}

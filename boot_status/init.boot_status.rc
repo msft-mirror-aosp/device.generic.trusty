@@ -1,0 +1,4 @@
+on boot
+    write /dev/kmsg "boot_kpi: K - init.boot_status.rc 'on boot'"
+    setprop dev.bootcomplete 1
+    setprop sys.boot_completed 1
