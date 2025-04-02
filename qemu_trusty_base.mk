@@ -135,7 +135,7 @@ PRODUCT_HOST_PACKAGES += \
     sload_f2fs \
     toybox \
 
-PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc
+PRODUCT_PACKAGES += init.usb.rc init.usb.configfs.rc init.boot_status.rc
 
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 
