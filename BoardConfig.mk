@@ -39,8 +39,11 @@ QEMU_CUSTOMIZATIONS := true
 
 # Include the ramdisk image into the target files because
 # the prebuilts in the Trusty manifest need it there.
+#
+# TODO: Switch back to LZ4 once we have a prebuilt lz4 binary
+# for replace_ramdisk_modules.py to call.
 BOARD_IMG_USE_RAMDISK := true
-BOARD_RAMDISK_USE_LZ4 := true
+BOARD_RAMDISK_USE_LZ4 := false
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
 TARGET_KERNEL_USE ?= 6.12
