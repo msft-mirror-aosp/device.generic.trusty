@@ -162,9 +162,7 @@ VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
 # Trusty VM/TEE products #
 ##########################
 
-# TODO(b/393850980): enable TRUSTY_SYSTEM_VM_USE_PVMFW when
-# necessary dependencied are available on QEMU (e.g. ARM TRNG supported in TF-A)
-TRUSTY_SYSTEM_VM_USE_PVMFW := false
+TRUSTY_SYSTEM_VM_USE_PVMFW := true
 ifeq ($(TRUSTY_SYSTEM_VM_USE_PVMFW),true)
 PRODUCT_PACKAGES += \
       pvmfw_test_img.img \
