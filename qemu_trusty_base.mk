@@ -103,6 +103,13 @@ TARGET_COPY_OUT_SYSTEM_EXT := system/system_ext
 BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE :=
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += device/generic/trusty/sepolicy/system_ext/private
 
+# We explicitly set this so that ro.product.first_api_level is set.
+# This is important because there are certain provisioning-related VTS
+# tests that expect to derive the vendor API level a device was provisioned
+# with. If we'd like to test the bleeding edge of new provisioning requirements
+# in the future, this should be bumped as new API levels become available.
+PRODUCT_SHIPPING_API_LEVEL := 36
+
 # Creates metadata partition mount point under root for
 # the devices with metadata partition
 BOARD_USES_METADATA_PARTITION := true
