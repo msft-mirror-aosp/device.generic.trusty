@@ -67,6 +67,7 @@ VIRTUAL_DEVICE_MODULES_PATH ?= \
 RAMDISK_VIRTUAL_DEVICE_MODULES := \
     failover.ko \
     net_failover.ko \
+    system_heap.ko \
     virtio_mmio.ko \
     virtio_net.ko \
 
@@ -82,7 +83,6 @@ RAMDISK_SYSTEM_MODULES := \
 TRUSTY_MODULES_PATH ?= \
     kernel/prebuilts/common-modules/trusty/$(TARGET_KERNEL_USE)/$(subst _,-,$(TARGET_KERNEL_ARCH))
 RAMDISK_TRUSTY_MODULES := \
-    system_heap.ko \
     ffa-core.ko \
     ffa-module.ko \
     trusty-ffa.ko \
