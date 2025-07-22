@@ -36,6 +36,11 @@ on post-fs
     mkdir /mnt/vendor/persist/ss 0770 root system
     restorecon_recursive /mnt/vendor/persist/ss
 
+    # re-create the /data/vendor/ss/persist/0 symlink on every boot since
+    # /mnt/vendor/persist is not actually a persistent file system.
+    symlink /dev/block/vdf /mnt/vendor/persist/ss/0
+    chown system system /mnt/vendor/persist/ss/0
+
 on post-fs-data
     mkdir /data/vendor/ss 0770 root system
     symlink /mnt/vendor/persist/ss /data/vendor/ss/persist
@@ -151,7 +156,9 @@ service storageproxydlogs /system/bin/logcat -s storageproxyd:*
 
 # start storageproxyd when rpmb virtual port is ready
 service storageproxyd /vendor/bin/storageproxyd -d /dev/trusty-ipc-dev0 \
-        -r /dev/${ro.boot.qemu.vport}p1 -p /data/vendor/ss -t virt
+        -r /dev/${ro.boot.qemu.vport}p1 -p /data/vendor/ss -t virt \
+        --file_storage_mapping 0:/dev/block/vdg \
+        --file_storage_mapping persist/0:/dev/block/vdf
     class early_hal
     user system
     group system

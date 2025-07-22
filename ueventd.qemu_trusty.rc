@@ -1,4 +1,6 @@
 /dev/ion                  0660   system     system
+/dev/block/vdf            0600   system     system
+/dev/block/vdg            0600   system     system
 /dev/vport[0-9]*p1        0660   system     system
 /dev/vport[0-9]*p2        0660   system     system
 /dev/trusty-ipc-dev0      0660   system     drmrpc
