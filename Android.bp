@@ -45,6 +45,7 @@ java_genrule_host {
         "adb",
         "assemble_cvd",
         "dtc",
+        "depmod",
         "e2fsdroid",
         "lz4",
         "make_f2fs",
@@ -61,7 +62,7 @@ java_genrule_host {
     ],
     cmd: "mkdir -p $(genDir)/trusty-host_package/bin && " +
         "cp -f -t $(genDir)/trusty-host_package/bin " +
-        "$(location adb) $(location assemble_cvd) $(location dtc) " +
+        "$(location adb) $(location assemble_cvd) $(location depmod) $(location dtc) " +
         "$(location e2fsdroid) $(location lz4) $(location make_f2fs) $(location mkbootfs) " +
         "$(location mke2fs) $(location replace_ramdisk_modules) " +
         "$(location rpmb_dev) $(location sload_f2fs) " +

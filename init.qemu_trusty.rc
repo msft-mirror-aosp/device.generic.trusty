@@ -30,6 +30,7 @@ on post-fs
 
 on post-fs-data
     mkdir /data/vendor/ss 0770 root system
+    mkdir /mnt/vendor/persist 0770 root system
     mkdir /mnt/vendor/persist/ss 0770 root system
     restorecon_recursive /mnt/vendor/persist/ss
     symlink /mnt/vendor/persist/ss /data/vendor/ss/persist
