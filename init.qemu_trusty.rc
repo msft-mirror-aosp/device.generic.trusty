@@ -26,7 +26,7 @@ on post-fs
     # (on-post-fs at the latest because vold
     # needs secure storage for rollback protection
     # of the data partition encryption key
-    wait /dev/vport4p1
+    wait /dev/${ro.boot.qemu.vport}p1
 
 on post-fs-data
     mkdir /data/vendor/ss 0770 root system
@@ -140,7 +140,7 @@ service bugreport /system/bin/dumpstate -d -p
 
 # start storageproxyd when rpmb virtual port is ready
 service storageproxyd /vendor/bin/storageproxyd -d /dev/trusty-ipc-dev0 \
-        -r /dev/vport4p1 -p /data/vendor/ss -t virt
+        -r /dev/${ro.boot.qemu.vport}p1 -p /data/vendor/ss -t virt
     class early_hal
     user system
     group system
