@@ -138,6 +138,12 @@ service bugreport /system/bin/dumpstate -d -p
     oneshot
     keycodes 114 115 116
 
+service storageproxydlogs /system/bin/logcat -s storageproxyd:*
+    class early_hal
+    user logd
+    group log
+    console
+
 # start storageproxyd when rpmb virtual port is ready
 service storageproxyd /vendor/bin/storageproxyd -d /dev/trusty-ipc-dev0 \
         -r /dev/${ro.boot.qemu.vport}p1 -p /data/vendor/ss -t virt
