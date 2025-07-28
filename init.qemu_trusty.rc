@@ -28,11 +28,16 @@ on post-fs
     # of the data partition encryption key
     wait /dev/${ro.boot.qemu.vport}p1
 
-on post-fs-data
-    mkdir /data/vendor/ss 0770 root system
+    # Setup fake vendor/persist directory before storageproxyd starts.
+    # If /data/vendor/ss and the /data/vendor/ss/persist symlink has already
+    # been created on a previous boot cycle, then tdp will be mounted the
+    # first time storageproxyd starts instead of the second time.
     mkdir /mnt/vendor/persist 0770 root system
     mkdir /mnt/vendor/persist/ss 0770 root system
     restorecon_recursive /mnt/vendor/persist/ss
+
+on post-fs-data
+    mkdir /data/vendor/ss 0770 root system
     symlink /mnt/vendor/persist/ss /data/vendor/ss/persist
     chown root system /data/vendor/ss/persist
     chmod 0770 /data/vendor/ss/persist
