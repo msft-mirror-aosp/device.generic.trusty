@@ -28,11 +28,21 @@ on post-fs
     # of the data partition encryption key
     wait /dev/${ro.boot.qemu.vport}p1
 
-on post-fs-data
-    mkdir /data/vendor/ss 0770 root system
+    # Setup fake vendor/persist directory before storageproxyd starts.
+    # If /data/vendor/ss and the /data/vendor/ss/persist symlink has already
+    # been created on a previous boot cycle, then tdp will be mounted the
+    # first time storageproxyd starts instead of the second time.
     mkdir /mnt/vendor/persist 0770 root system
     mkdir /mnt/vendor/persist/ss 0770 root system
     restorecon_recursive /mnt/vendor/persist/ss
+
+    # re-create the /data/vendor/ss/persist/0 symlink on every boot since
+    # /mnt/vendor/persist is not actually a persistent file system.
+    symlink /dev/block/vdf /mnt/vendor/persist/ss/0
+    chown system system /mnt/vendor/persist/ss/0
+
+on post-fs-data
+    mkdir /data/vendor/ss 0770 root system
     symlink /mnt/vendor/persist/ss /data/vendor/ss/persist
     chown root system /data/vendor/ss/persist
     chmod 0770 /data/vendor/ss/persist
@@ -138,9 +148,17 @@ service bugreport /system/bin/dumpstate -d -p
     oneshot
     keycodes 114 115 116
 
+service storageproxydlogs /system/bin/logcat -s storageproxyd:*
+    class early_hal
+    user logd
+    group log
+    console
+
 # start storageproxyd when rpmb virtual port is ready
 service storageproxyd /vendor/bin/storageproxyd -d /dev/trusty-ipc-dev0 \
-        -r /dev/${ro.boot.qemu.vport}p1 -p /data/vendor/ss -t virt
+        -r /dev/${ro.boot.qemu.vport}p1 -p /data/vendor/ss -t virt \
+        --file_storage_mapping 0:/dev/block/vdg \
+        --file_storage_mapping persist/0:/dev/block/vdf
     class early_hal
     user system
     group system

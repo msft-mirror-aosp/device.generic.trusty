@@ -1,4 +1,5 @@
 # virtual port device (qemu)
+type tee_block_device, dev_type;
 type rpmb_virt_device, dev_type;
 
 allow tee rpmb_virt_device:chr_file { open read write };
@@ -7,10 +8,14 @@ type persist_ss_file, file_type, vendor_persist_type;
 
 allow tee persist_ss_file:file create_file_perms;
 allow tee persist_ss_file:dir create_dir_perms;
+allow tee persist_ss_file:lnk_file create_file_perms;
 allow tee persist_file:dir r_dir_perms;
 allow tee mnt_vendor_file:dir r_dir_perms;
 allow tee tee_data_file:dir create_dir_perms;
-allow tee tee_data_file:lnk_file r_file_perms;
+allow tee tee_data_file:lnk_file create_file_perms;
+
+allow tee block_device:dir search;
+allow tee tee_block_device:blk_file rw_file_perms;
 
 # Handle wake locks
 wakelock_use(tee)
