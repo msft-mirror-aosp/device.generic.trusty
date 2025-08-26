@@ -13,7 +13,11 @@ is_flag_enabled(RELEASE_AVF_ENABLE_EARLY_VM, `
     allow trusty_security_vm_launcher kmsg_debug_device:chr_file rw_file_perms;
     use_bootstrap_libs(trusty_security_vm_launcher)
 
-    allow trusty_security_vm_launcher self:global_capability_class_set { net_bind_service ipc_lock sys_resource };
+    allow trusty_security_vm_launcher self:global_capability_class_set { net_bind_service ipc_lock sys_resource ipc_owner };
+
+    # allow trusty_security_vm_launcher to launch protected VMs
+    # that can communicate to the TEE over FF-A
+    allow trusty_security_vm_launcher guest_ffa_tee_service:tee_service use;
 
     tmpfs_domain(trusty_security_vm_launcher)
 ')
