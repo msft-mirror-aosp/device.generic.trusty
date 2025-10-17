@@ -10,6 +10,7 @@
 /vendor/bin/storageproxyd            u:object_r:tee_exec:s0
 /data/vendor/ss(/.*)?                u:object_r:tee_data_file:s0
 /mnt/vendor/persist/ss(/.*)?         u:object_r:persist_ss_file:s0
+/metadata/boot_control_mock(/.*)?    u:object_r:hal_bootctl_file:s0
 
 /vendor/bin/dhcpclient                                                  u:object_r:dhcpclient_exec:s0
 /vendor/bin/hw/android.hardware.confirmationui-service.trusty           u:object_r:hal_confirmationui_default_exec:s0
@@ -20,3 +21,4 @@
 /vendor/bin/hw/android.hardware.security.keymint-service.rust.trusty    u:object_r:hal_keymint_default_exec:s0
 /vendor/bin/hw/android.hardware.security.keymint-service.trusty_tee.cpp u:object_r:hal_keymint_default_exec:s0
 /vendor/bin/hw/android.hardware.security.keymint-service.trusty_tee     u:object_r:hal_keymint_default_exec:s0
+/vendor/bin/hw/android.hardware.boot-service.mock-trusty                u:object_r:hal_bootctl_default_exec:s0
