@@ -9,6 +9,8 @@ set_prop(dhcpclient, vendor_net_wlan0_prop);
 set_prop(dhcpclient, vendor_net_eth0_prop);
 allow dhcpclient self:capability { net_admin net_raw sys_module };
 allow dhcpclient self:netlink_route_socket { ioctl write nlmsg_write };
+allowxperm dhcpclient self:netlink_route_socket nlmsg { RTM_NEWADDR
+                                                        RTM_NEWROUTE };
 allow dhcpclient varrun_file:dir search;
 allow dhcpclient self:packet_socket { create bind write read };
 allowxperm dhcpclient self:netlink_route_socket ioctl { SIOCGIFFLAGS

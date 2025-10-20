@@ -9,11 +9,19 @@ is_flag_enabled(RELEASE_AVF_ENABLE_EARLY_VM, `
     early_virtmgr_use(trusty_security_vm_launcher)
     binder_use(trusty_security_vm_launcher)
     add_service(trusty_security_vm_launcher, accessor_trusty_keymint_comm_service)
+    add_service(trusty_security_vm_launcher, accessor_trusty_gatekeeper_service)
+    add_service(trusty_security_vm_launcher, accessor_trusty_widevine_comm_service)
+    add_service(trusty_security_vm_launcher, accessor_trusty_keymint_provisioning_service)
+    add_service(trusty_security_vm_launcher, accessor_trusty_hwcrypto_sharedsecret_service)
 
     allow trusty_security_vm_launcher kmsg_debug_device:chr_file rw_file_perms;
     use_bootstrap_libs(trusty_security_vm_launcher)
 
-    allow trusty_security_vm_launcher self:global_capability_class_set { net_bind_service ipc_lock sys_resource };
+    allow trusty_security_vm_launcher self:global_capability_class_set { net_bind_service ipc_lock sys_resource ipc_owner };
+
+    # allow trusty_security_vm_launcher to launch protected VMs
+    # that can communicate to the TEE over FF-A
+    allow trusty_security_vm_launcher guest_ffa_tee_service:tee_service use;
 
     tmpfs_domain(trusty_security_vm_launcher)
 ')
