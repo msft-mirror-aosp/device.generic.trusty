@@ -5,3 +5,9 @@ allow hal_bootctl_default hal_bootctl_file:dir create_dir_perms;
 
 # BootControl service boot properties
 set_prop(hal_bootctl_default, vendor_mock_boot_props)
+
+# Command-line tool can call BootControlService
+type hal_bootctl_cmd, domain;
+type hal_bootctl_cmd_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(hal_bootctl_cmd)
+hal_client_domain(hal_bootctl_cmd, hal_bootctl)

@@ -43,3 +43,19 @@ cc_binary {
     vintf_fragments: ["android.hardware.boot-service.mock-trusty.xml"],
     vendor: true,
 }
+
+rust_binary {
+    name: "android.hardware.boot-service.mock-trusty-cmd",
+    relative_install_path: "hw",
+    srcs: ["cmd.rs"],
+    rustlibs: [
+        "libandroid_logger",
+        "libkernlog",
+        "liblog_rust",
+        "libclap",
+        "libbinder_rs",
+        "liblibc",
+        "android.hardware.boot-V1-rust",
+    ],
+    vendor: true,
+}
