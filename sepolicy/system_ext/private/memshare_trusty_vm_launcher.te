@@ -1,0 +1,28 @@
+type memshare_trusty_vm_launcher, domain, coredomain;
+type memshare_trusty_vm_launcher_exec, exec_type, system_file_type, file_type;
+type memshare_trusty_vm_launcher_tmpfs, file_type;
+
+allow memshare_trusty_vm_launcher accessor_cmd_processor_service:service_manager { find add };
+allow memshare_trusty_vm_launcher trusty_cmd_processor_service:service_manager { find };
+
+allow memshare_trusty_vm_launcher accessor_mem_share_service:service_manager { find add };
+allow memshare_trusty_vm_launcher trusty_mem_share_service:service_manager { find };
+
+allow memshare_trusty_vm_launcher trusty_memshare_service:service_manager { find add };
+
+init_daemon_domain(memshare_trusty_vm_launcher)
+domain_auto_trans(init, memshare_trusty_vm_launcher_exec, memshare_trusty_vm_launcher)
+
+early_virtmgr_use(memshare_trusty_vm_launcher)
+binder_use(memshare_trusty_vm_launcher)
+
+allow memshare_trusty_vm_launcher kmsg_debug_device:chr_file rw_file_perms;
+use_bootstrap_libs(memshare_trusty_vm_launcher)
+
+allow memshare_trusty_vm_launcher self:global_capability_class_set { net_bind_service ipc_lock sys_resource ipc_owner };
+
+# allow memshare_trusty_vm_launcher to launch protected VMs
+# that can communicate to the TEE over FF-A
+allow memshare_trusty_vm_launcher guest_ffa_tee_service:tee_service use;
+
+tmpfs_domain(memshare_trusty_vm_launcher)

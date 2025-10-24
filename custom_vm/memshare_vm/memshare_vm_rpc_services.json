@@ -1,0 +1,12 @@
+[
+  {
+    "port": 17,
+    "accessor_name": "android.os.IAccessor/ICommandProcessor/memshare_vm",
+    "internal_rpc_service_name": "android.trusty.cmdprocessor.ICommandProcessor/memshare_vm"
+  },
+  {
+    "port": 18,
+    "accessor_name": "android.os.IAccessor/IMemoryBufferShareVm/memshare_vm",
+    "internal_rpc_service_name": "android.trusty.membuf.IMemoryBufferShareVm/memshare_vm"
+  }
+]

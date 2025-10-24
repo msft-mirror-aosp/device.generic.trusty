@@ -1,0 +1,31 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_defaults {
+    name: "app.test.defaults",
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libbinder",
+        "libbinder_ndk",
+        "libutils",
+        "android.trusty.cmdprocessor-cpp",
+        "android.trusty.membuf-cpp",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    srcs: [
+        "main.cpp",
+    ],
+}
+
+cc_binary {
+    name: "app.test.system",
+    defaults: [
+        "app.test.defaults",
+    ],
+    system_ext_specific: true,
+}
