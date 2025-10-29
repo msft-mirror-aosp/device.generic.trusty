@@ -1,0 +1,5 @@
+# Properties used by init.qemu_trusty.rc
+system_public_prop(qemu_adbd_prop)
+system_public_prop(qemu_logcat_prop)
+get_prop(vendor_init, qemu_adbd_prop)
+get_prop(vendor_init, qemu_logcat_prop)
