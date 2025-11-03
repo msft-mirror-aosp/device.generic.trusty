@@ -13,6 +13,7 @@ cc_genrule {
             srcs: [
                 ":pvmfw_bin",
                 ":test_avf_bcc_dat",
+                ":test_ref_dt",
             ],
             enabled: true,
         },
@@ -20,7 +21,7 @@ cc_genrule {
     out: [
         "pvmfw_test_img.img",
     ],
-    cmd: "FILES=($(in)) && $(location pvmfw-tool) $(out) $${FILES[0]} $${FILES[1]}",
+    cmd: "FILES=($(in)) && $(location pvmfw-tool) $(out) $${FILES[0]} $${FILES[1]} $${FILES[2]}",
 }
 
 prebuilt_etc {
