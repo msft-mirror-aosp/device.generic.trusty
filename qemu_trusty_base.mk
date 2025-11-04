@@ -42,6 +42,7 @@ PRODUCT_PACKAGES += \
     apexd \
     atrace \
     awk \
+    casefolding_remover \
     cgroups.json \
     com.android.art \
     com.android.i18n \
