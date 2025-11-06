@@ -3,3 +3,6 @@ ro.vendor.trusty.storage.fs_ready          u:object_r:vendor_trusty_storage_prop
 
 # For checking if persist partition is mounted
 ro.vendor.persist.status u:object_r:vendor_persist_prop:s0 exact string
+
+# IBootControl Mock
+ro.boot.vendor.mock_boot_ctrl.*         u:object_r:vendor_mock_boot_props:s0
