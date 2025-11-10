@@ -35,6 +35,7 @@ PRODUCT_PACKAGES += \
     com.android.adbd \
     com.android.virt \
     adbd_system_api \
+    android.hardware.boot-service.mock-trusty \
     android.hardware.confirmationui@1.0-service.trusty \
     android.hardware.trusty.hwcryptohal-service \
     android.hidl.allocator@1.0-service \
@@ -42,6 +43,7 @@ PRODUCT_PACKAGES += \
     apexd \
     atrace \
     awk \
+    casefolding_remover \
     cgroups.json \
     com.android.art \
     com.android.i18n \

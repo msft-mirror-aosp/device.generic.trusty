@@ -1,0 +1,7 @@
+# BootControl service config files
+type hal_bootctl_file, file_type;
+allow hal_bootctl_default hal_bootctl_file:file create_file_perms;
+allow hal_bootctl_default hal_bootctl_file:dir create_dir_perms;
+
+# BootControl service boot properties
+set_prop(hal_bootctl_default, vendor_mock_boot_props)
