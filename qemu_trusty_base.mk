@@ -187,8 +187,7 @@ endif
 
 KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
 TRUSTY_KEYMINT_IMPL ?= rust
-# TODO(b/390206831): remove placeholder_trusted_hal when VM2TZ is supported
-TRUSTY_SYSTEM_VM ?= enabled_with_placeholder_trusted_hal
+TRUSTY_SYSTEM_VM ?= enabled
 ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
     $(call soong_config_set_bool, trusty_system_vm, placeholder_trusted_hal, true)
 endif
