@@ -9,10 +9,10 @@ on post-fs && property:ro.boot.vendor.apex.com.android.hardware.keymint=\
 com.android.hardware.keymint.trusty_tee.cpp
     enable vendor.keymint-service.trusty_tee.cpp
 
-# rust implementation
+# rust implementation - nonsecure flavor for qemu (provisioned via host)
 on post-fs && property:ro.boot.vendor.apex.com.android.hardware.keymint=\
 com.android.hardware.keymint.trusty_tee
-    enable vendor.keymint-service.trusty_tee
+    enable vendor.keymint-service.trusty_tee.nonsecure
 
 on early-init && property:ro.boot.vendor.apex.com.android.hardware.keymint=\
 com.android.hardware.keymint.trusty_system_vm
