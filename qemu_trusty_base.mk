@@ -99,6 +99,7 @@ PRODUCT_PACKAGES += \
     vendor_manifest.xml \
     android.hardware.security.see.storage-service.trusty.xml \
     android.hardware.security.see.authmgr.xml \
+    android.hardware.security.see.devicestate-service.trusty.xml \
 
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 TARGET_COPY_OUT_SYSTEM_EXT := system/system_ext
