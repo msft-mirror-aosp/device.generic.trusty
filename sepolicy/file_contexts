@@ -20,5 +20,5 @@
 /vendor/bin/hw/android.hardware.security.keymint-service.trusty         u:object_r:hal_keymint_default_exec:s0
 /vendor/bin/hw/android.hardware.security.keymint-service.rust.trusty    u:object_r:hal_keymint_default_exec:s0
 /vendor/bin/hw/android.hardware.security.keymint-service.trusty_tee.cpp u:object_r:hal_keymint_default_exec:s0
-/vendor/bin/hw/android.hardware.security.keymint-service.trusty_tee     u:object_r:hal_keymint_default_exec:s0
+/vendor/bin/hw/android.hardware.security.keymint-service.trusty_tee.nonsecure     u:object_r:hal_keymint_default_exec:s0
 /vendor/bin/hw/android.hardware.boot-service.mock-trusty                u:object_r:hal_bootctl_default_exec:s0
