@@ -1,0 +1,5 @@
+android.os.IAccessor/ICommandProcessor/memshare_vm        u:object_r:accessor_cmd_processor_service:s0
+android.trusty.cmdprocessor.ICommandProcessor/memshare_vm u:object_r:trusty_cmd_processor_service:s0
+android.trusty.membuf.IMemoryBufferShare/memshare_vm      u:object_r:trusty_memshare_service:s0
+android.os.IAccessor/IMemoryBufferShareVm/memshare_vm     u:object_r:accessor_mem_share_service:s0
+android.trusty.membuf.IMemoryBufferShareVm/memshare_vm    u:object_r:trusty_mem_share_service:s0
