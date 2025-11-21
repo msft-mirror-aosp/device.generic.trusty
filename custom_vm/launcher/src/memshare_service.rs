@@ -87,6 +87,7 @@ struct MemoryRange {
 
 struct MemoryManager {
     buffers: Vec<(u64, u64)>,
+    secure_buffers: Vec<(u64, u64)>,
 }
 
 impl MemoryManager {
@@ -94,14 +95,38 @@ impl MemoryManager {
     const HOST_BUFFER_1_BASE_ADDRESS: u64 = 0x8000_0000 + 64 * 1024 * 1024;
     const HOST_BUFFER_2_BASE_ADDRESS: u64 =
         Self::HOST_BUFFER_1_BASE_ADDRESS + Self::HOST_BUFFER_SUPPORTED_SIZE;
-    const HOST_BUFFER_SUPPORTED_SIZE: u64 = 4096;
+    const HOST_BUFFER_SUPPORTED_SIZE: u64 = 1024 * 1024;
+
+    const SECURE_BUFFER_BASE_ADDRESS: u64 = 0x9000_0000;
+    const SECURE_BUFFER_SUPPORTED_SIZE: u64 = 1024 * 1024;
 
     fn new() -> Self {
         let buffers = vec![
             (Self::HOST_BUFFER_2_BASE_ADDRESS, Self::HOST_BUFFER_SUPPORTED_SIZE),
             (Self::HOST_BUFFER_1_BASE_ADDRESS, Self::HOST_BUFFER_SUPPORTED_SIZE),
         ];
-        Self { buffers }
+        let secure_buffers =
+            vec![(Self::SECURE_BUFFER_BASE_ADDRESS, Self::SECURE_BUFFER_SUPPORTED_SIZE)];
+        Self { buffers, secure_buffers }
+    }
+
+    fn get_buffer_reference(
+        &mut self,
+        protection_id: ProtectionId,
+    ) -> Result<(u64, &mut Vec<(u64, u64)>), MemShareError> {
+        match protection_id {
+            ProtectionId::HostBuffer => Ok((Self::HOST_BUFFER_SUPPORTED_SIZE, &mut self.buffers)),
+            ProtectionId::SecureDisplayFrameBuffer => {
+                Ok((Self::SECURE_BUFFER_SUPPORTED_SIZE, &mut self.secure_buffers))
+            }
+            _ => {
+                log::error!(
+                    "Only HostBuffer  and SecureDisplayFrameBuffer are supported, received: {:?}",
+                    protection_id
+                );
+                Err(MemShareError::InvalidValue)
+            }
+        }
     }
 
     fn add_area(
@@ -110,21 +135,21 @@ impl MemoryManager {
         base_address: u64,
         size_bytes: u64,
     ) -> Result<(), MemShareError> {
-        if protection_id != ProtectionId::HostBuffer {
-            log::error!("Only Host buffers are supported");
-            return Err(MemShareError::InvalidValue);
-        }
-        if size_bytes != Self::HOST_BUFFER_SUPPORTED_SIZE {
+        let (supported_size, buffers) = self.get_buffer_reference(protection_id)?;
+
+        if size_bytes != supported_size {
             log::error!(
-                "add_area: Only buffers of size {} are supported, received {}",
-                Self::HOST_BUFFER_SUPPORTED_SIZE,
+                "add_area: Only buffers of size {} are supported, for protection id {:?}; received {}",
+                supported_size,
+                protection_id,
                 size_bytes
             );
             return Err(MemShareError::InvalidValue);
         }
         // TODO: We need to check for overlaps with existing areas, overflow on the addresses,
         //       and that base addresses match protection IDs
-        self.buffers.push((base_address, size_bytes));
+        buffers.push((base_address, size_bytes));
+
         Ok(())
     }
 
@@ -133,24 +158,23 @@ impl MemoryManager {
         size_bytes: i32,
         protection_id: ProtectionId,
     ) -> Result<(u64, u64), MemShareError> {
-        if protection_id != ProtectionId::HostBuffer {
-            log::error!("Only Host buffers are supported");
-            return Err(MemShareError::InvalidValue);
-        }
-        if (size_bytes < 0) || (size_bytes as u64 != Self::HOST_BUFFER_SUPPORTED_SIZE) {
+        let (supported_size, buffers) = self.get_buffer_reference(protection_id)?;
+
+        if (size_bytes < 0) || (size_bytes as u64 != supported_size) {
             log::error!(
-                "get_map_area: Only buffers of size {} are supported, received {}",
+                "get_map_area: Only buffers of size {} are supported for protection ID {:?}, received {}",
                 Self::HOST_BUFFER_SUPPORTED_SIZE,
+                protection_id,
                 size_bytes
             );
             return Err(MemShareError::InvalidValue);
         }
-        if self.buffers.is_empty() {
-            log::error!("No more buffers available");
+        if buffers.is_empty() {
+            log::error!("No more buffers available for pretection ID {:?}", protection_id);
             return Err(MemShareError::AllocationError);
         }
         // buffer is not empty, so we can unwrap
-        let buffer = self.buffers.pop().unwrap();
+        let buffer = buffers.pop().unwrap();
         Ok((buffer.0, buffer.0 + buffer.1))
     }
 }

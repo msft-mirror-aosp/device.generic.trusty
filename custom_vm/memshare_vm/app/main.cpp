@@ -37,11 +37,18 @@ using android::trusty::cmdprocessor::MemoryBufferReference;
 using android::trusty::membuf::IMemoryBufferShare;
 using android::trusty::membuf::MemoryBufferToken;
 using android::trusty::membuf::ShareMemoryBufferResult;
+using android::trusty::membuf::IMemoryBufferShare::HOST_BUFFER;
+using android::trusty::membuf::IMemoryBufferShare::SECURE_DISPLAY_FRAME_BUFFER;
 
 static std::weak_ptr<AccessorProvider> mAccessor;
 // TODO(b/437876662): We should be able to remove the local caching of the accessor. Keeping local
 //                    cache for now until bug is closed because connection seems to be faster.
 static android::sp<ICommandProcessor> mAccessorCmdProcessor;
+
+const char* shared_buffer_heap_device_name = "/dev/dma_heap/system";
+const char* secure_buffer_heap_device_name = "/dev/dma_heap/example_heap";
+
+#define BUFFER_SIZE 1024 * 1024
 
 android::sp<IMemoryBufferShare> getMemShareBuffer() {
     auto binder =
@@ -79,8 +86,7 @@ static inline bool align_overflow(size_t size, size_t alignment, size_t* aligned
     return overflow;
 }
 
-static int allocate_buffers(size_t size) {
-    const char* device_name = "/dev/dma_heap/system";
+static int allocate_buffers(size_t size, const char* device_name) {
     int dma_heap_fd = open(device_name, O_RDONLY | O_CLOEXEC);
     if (dma_heap_fd < 0) {
         LOG(ERROR) << "Cannot open " << device_name;
@@ -133,7 +139,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         return -1;
     }
 
-    auto fd = allocate_buffers(4096);
+    auto fd = allocate_buffers(BUFFER_SIZE, shared_buffer_heap_device_name);
     if (fd < 0) {
         LOG(ERROR) << "couldn't allocate buffer";
         std::cout << "couldn't allocate buffer" << std::endl;
@@ -155,7 +161,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     // Don't drop the ShareMemoryBufferResult object even after getting the token, that
     // could trigger a cleanup of the resources on the TA
     ShareMemoryBufferResult aidl_return;
-    auto res = memSharing->shareMemoryBuffer(pfd, 4096, 1, &aidl_return);
+    auto res = memSharing->shareMemoryBuffer(pfd, BUFFER_SIZE, HOST_BUFFER, &aidl_return);
     if (!res.isOk()) {
         LOG(ERROR) << "Couldn't share buffer";
         std::cout << "Couldn't share buffer" << std::endl;
@@ -219,6 +225,42 @@ int main(int /*argc*/, char* /*argv*/[]) {
         std::cout << "comparison failed: found " << std::hex
                   << static_cast<unsigned int>(mapped_data[0]) << std::endl;
     }
+
+    /*auto secure_fd = allocate_buffers(4096, secure_buffer_heap_device_name);
+    if (secure_fd < 0) {
+        LOG(ERROR) << "couldn't allocate buffer";
+        std::cout << "couldn't allocate buffer" << std::endl;
+        //return -1;
+    } else {
+        std::cout << "allocated secure buffer!!!!" << std::endl;
+    }
+
+    ShareMemoryBufferResult secure_buffer_context;
+    res = memSharing->shareMemoryBuffer(pfd, BUFFER_SIZE, SECURE_DISPLAY_FRAME_BUFFER,
+    &secure_buffer_context); if (!res.isOk()) { LOG(ERROR) << "Couldn't share secure buffer";
+        std::cout << "Couldn't share secure buffer" << std::endl;
+        return -1;
+    }
+
+    MemoryBufferToken sec_mem_token;
+    res = secure_buffer_context.context->getPortableToken(&sec_mem_token);
+    if (!res.isOk()) {
+        LOG(ERROR) << "Couldn't get secure memory portable token";
+        std::cout << "Couldn't get secure memory portable token" << std::endl;
+        return -1;
+    }
+
+    MemoryBufferReference sec_ref;
+    sec_ref.token = std::move(sec_mem_token);
+    sec_ref.startOffset = 0;
+    sec_ref.sizeBytes = 4096;
+    std::vector<MemoryBufferReference> secBuffRef;
+    secBuffRef.push_back(std::move(sec_ref));
+    //ret = cmdProcessor->processCommand(android::String16("print"), secBuffRef, cmdIn, &cmdOut);
+    //std::cout << "processCommand print for secure buffer returned " << ret << std::endl;
+
+    res = secure_buffer_context.context->releaseMemoryBufferContext(&release_result);
+    std::cout << "releaseMemoryBufferContext for secure buffer returned " << ret << std::endl;*/
 
     LOG(INFO) << "test application finished execution";
     std::cout << "test application finished execution" << std::endl;
