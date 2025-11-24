@@ -192,10 +192,6 @@ ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
     $(call soong_config_set_bool, trusty_system_vm, placeholder_trusted_hal, true)
 endif
 
-# TODO(b/453414712): remove when DT-based RoT is supported for the System VM
-ifeq ($(findstring enabled, $(TRUSTY_SYSTEM_VM)),enabled)
-    $(call soong_config_set_bool, trusty_system_vm, keymint_rot_nonsecure, true)
-endif
 $(call soong_config_set_bool, trusty_system_vm, enabled, true)
 $(call soong_config_set, trusty_system_vm, buildtype, $(TARGET_BUILD_VARIANT))
 $(call soong_config_set_bool, trusty_tee, enabled, true)

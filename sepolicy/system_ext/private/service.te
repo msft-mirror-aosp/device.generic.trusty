@@ -1,0 +1,5 @@
+type accessor_cmd_processor_service, service_manager_type;
+type trusty_cmd_processor_service, service_manager_type;
+type trusty_memshare_service, service_manager_type;
+type accessor_mem_share_service, service_manager_type;
+type trusty_mem_share_service, service_manager_type;
