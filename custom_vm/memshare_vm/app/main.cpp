@@ -215,8 +215,6 @@ int main(int /*argc*/, char* /*argv*/[]) {
     }
 
     int32_t release_result;
-    res = aidl_return.context->releaseMemoryBufferContext(&release_result);
-    std::cout << "releaseMemoryBufferContext release returned " << ret << std::endl;
 
     std::cout << "about to compare" << std::endl;
     if (mapped_data[0] == 45) {
@@ -226,7 +224,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
                   << static_cast<unsigned int>(mapped_data[0]) << std::endl;
     }
 
-    /*auto secure_fd = allocate_buffers(4096, secure_buffer_heap_device_name);
+    auto secure_fd = allocate_buffers(BUFFER_SIZE, secure_buffer_heap_device_name);
     if (secure_fd < 0) {
         LOG(ERROR) << "couldn't allocate buffer";
         std::cout << "couldn't allocate buffer" << std::endl;
@@ -235,9 +233,14 @@ int main(int /*argc*/, char* /*argv*/[]) {
         std::cout << "allocated secure buffer!!!!" << std::endl;
     }
 
+    android::base::unique_fd sec_ufd(secure_fd);
+    android::os::ParcelFileDescriptor sec_pfd(std::move(sec_ufd));
+
     ShareMemoryBufferResult secure_buffer_context;
-    res = memSharing->shareMemoryBuffer(pfd, BUFFER_SIZE, SECURE_DISPLAY_FRAME_BUFFER,
-    &secure_buffer_context); if (!res.isOk()) { LOG(ERROR) << "Couldn't share secure buffer";
+    res = memSharing->shareMemoryBuffer(sec_pfd, BUFFER_SIZE, SECURE_DISPLAY_FRAME_BUFFER,
+                                        &secure_buffer_context);
+    if (!res.isOk()) {
+        LOG(ERROR) << "Couldn't share secure buffer";
         std::cout << "Couldn't share secure buffer" << std::endl;
         return -1;
     }
@@ -256,11 +259,15 @@ int main(int /*argc*/, char* /*argv*/[]) {
     sec_ref.sizeBytes = 4096;
     std::vector<MemoryBufferReference> secBuffRef;
     secBuffRef.push_back(std::move(sec_ref));
-    //ret = cmdProcessor->processCommand(android::String16("print"), secBuffRef, cmdIn, &cmdOut);
-    //std::cout << "processCommand print for secure buffer returned " << ret << std::endl;
+    std::cout << "about to call processCommand print for secure buffer " << std::endl;
+    ret = cmdProcessor->processCommand(android::String16("print"), secBuffRef, cmdIn, &cmdOut);
+    std::cout << "processCommand print for secure buffer returned " << ret << std::endl;
 
     res = secure_buffer_context.context->releaseMemoryBufferContext(&release_result);
-    std::cout << "releaseMemoryBufferContext for secure buffer returned " << ret << std::endl;*/
+    std::cout << "releaseMemoryBufferContext for secure buffer returned " << ret << std::endl;
+
+    res = aidl_return.context->releaseMemoryBufferContext(&release_result);
+    std::cout << "releaseMemoryBufferContext release returned " << ret << std::endl;
 
     LOG(INFO) << "test application finished execution";
     std::cout << "test application finished execution" << std::endl;
