@@ -218,7 +218,7 @@ impl MemoryBufferContextData {
                 log::error!("MemShare VM object was not available");
                 MemShareError::InvalidState
             })?;
-            vm.remove_file_mapping(dma_buffer_id).map_err(|e| {
+            vm.remove_memory_mapping(dma_buffer_id).map_err(|e| {
                 log::error!("couldn't remove DMA buffer: {:?}", e);
                 MemShareError::BufferMappingProblem
             })?;
@@ -428,7 +428,7 @@ fn map_memory_buffer(
     })?;
     log::info!("Mapping fd {file:?} at start: {range_ipa_start:#x} end: {range_ipa_end:#x}");
     let dma_buffer_id =
-        vm.add_file_mapping(file, range_ipa_start, range_ipa_end, 0, true).map_err(|e| {
+        vm.add_memory_mapping(file, range_ipa_start, range_ipa_end, 0, true).map_err(|e| {
             log::error!("Error received when mapping buffer: {:?}", e);
             let add_area_result = memory_manager.lock().expect("poisoned mutex").add_area(
                 protection_id,
