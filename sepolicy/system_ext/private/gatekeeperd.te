@@ -1,0 +1,8 @@
+# Allow gatekeeperd to call binder services served in trusty_security_vm_launcher
+binder_call(gatekeeperd, trusty_security_vm_launcher)
+
+allow gatekeeperd accessor_trusty_gatekeeper_service:service_manager find;
+
+# Allow gatekeeperd to use file descriptors and vsock from early_virtmgr
+allow gatekeeperd early_virtmgr_domain:fd { use };
+allow gatekeeperd early_virtmgr_domain:vsock_socket { getattr getopt read write };
