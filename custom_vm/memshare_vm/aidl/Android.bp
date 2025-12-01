@@ -1,0 +1,57 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+aidl_interface {
+    name: "android.trusty.membuf",
+    host_supported: true,
+    srcs: [
+        "android/trusty/membuf/*.aidl",
+    ],
+    backend: {
+        java: {
+            enabled: false,
+        },
+        cpp: {
+            enabled: true,
+        },
+        rust: {
+            enabled: true,
+        },
+        ndk: {
+            enabled: true,
+        },
+    },
+    unstable: true,
+    vendor_available: true,
+    owner: "aosp",
+}
+
+aidl_interface {
+    name: "android.trusty.cmdprocessor",
+    host_supported: true,
+    srcs: [
+        "android/trusty/cmdprocessor/*.aidl",
+    ],
+    imports: [
+        "android.trusty.membuf",
+    ],
+    backend: {
+        java: {
+            enabled: false,
+        },
+        cpp: {
+            enabled: true,
+        },
+        rust: {
+            enabled: true,
+        },
+        ndk: {
+            enabled: true,
+        },
+    },
+    unstable: true,
+    vendor_available: true,
+    owner: "aosp",
+    frozen: false,
+}

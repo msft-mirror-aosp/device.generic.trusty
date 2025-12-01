@@ -185,6 +185,8 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 
 endif
 
+TRUSTY_SYSTEM_VM_INCLUDE_MEMSHARE_EXAMPLE ?= false
+
 KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
 TRUSTY_KEYMINT_IMPL ?= rust
 TRUSTY_SYSTEM_VM ?= enabled
@@ -208,6 +210,10 @@ $(call inherit-product, system/core/trusty/trusty-base.mk)
 $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-test.mk)
 $(call inherit-product-if-exists, trusty/vendor/google/proprietary/device/device.mk)
+
+ifeq ($(TRUSTY_SYSTEM_VM_INCLUDE_MEMSHARE_EXAMPLE),true)
+    $(call inherit-product, device/generic/trusty/custom_vm/memshare_vm/memshare_vm_system.mk)
+endif
 
 # Test Utilities
 PRODUCT_PACKAGES += \

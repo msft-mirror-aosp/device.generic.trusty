@@ -1,0 +1,43 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+rust_defaults {
+    name: "memshare_trusty_vm_launcher_defaults",
+    edition: "2021",
+    prefer_rlib: true,
+    rustlibs: [
+        "android.trusty.membuf-rust",
+        "libanyhow",
+        "libavf_bindgen",
+        "libbinder_rs",
+        "libclap",
+        "libenv_logger",
+        "libhypervisor_props",
+        "liblog_rust",
+        "libscopeguard",
+        "libserde",
+        "libserde_json",
+        "libthiserror",
+    ],
+    shared_libs: ["libavf"],
+    enabled: true,
+    apex_available: [
+        "//apex_available:platform",
+    ],
+}
+
+rust_binary {
+    name: "memshare_trusty_vm_launcher_system",
+    crate_name: "memshare_trusty_vm_launcher_system",
+    defaults: [
+        "memshare_trusty_vm_launcher_defaults",
+    ],
+    srcs: ["src/main_system.rs"],
+    rustlibs: [
+        "android.system.virtualizationservice-rust",
+        "libvmclient",
+        "libnix",
+    ],
+    system_ext_specific: true,
+}

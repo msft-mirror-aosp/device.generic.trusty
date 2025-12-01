@@ -15,6 +15,12 @@
 
 soong_namespace {}
 
+dirgroup {
+    name: "trusty_dirgroup_device_generic_trusty",
+    dirs: ["."],
+    visibility: ["//trusty/vendor/google/aosp/scripts"],
+}
+
 package {
     default_applicable_licenses: ["device_generic_trusty_license"],
 }

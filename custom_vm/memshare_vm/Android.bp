@@ -1,0 +1,190 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+// - Trusty VM payloads on arm64 are pvmfw enabled
+//   AVF VM build system uses the raw binary image (:trusty_memshare_vm_unsigned),
+//   adds pvmfw footer and generates a pvmfw-compliant signed elf file)
+// - Trusty VM payload on x86 are for now loaded in Cuttlefish unsigned
+//   the unsigned generated elf is used directly by AV
+//
+// see packages/modules/Virtualization/guest/trusty
+
+prebuilt_etc {
+    name: "trusty_memshare_vm.elf.system",
+    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+        ("android", "arm64", true): true,
+        ("android", "x86_64", true): false,
+        (default, default, default): false,
+    }),
+    src: select((os(), arch()), {
+        ("android", "arm64"): ":trusty_memshare_vm_signed",
+        (default, default): ":empty_file",
+    }),
+    system_ext_specific: true,
+    relative_install_path: "vm/trusty_vm",
+    filename: "trusty_memshare_vm.elf",
+}
+
+cc_binary {
+    name: "trusty_memshare_vm_signed",
+    srcs: [
+        ":trusty_memshare_vm_signed_bin_obj",
+    ],
+    linker_scripts: [
+        ":trusty_vm_sections.ld",
+    ],
+    //vendor_available: true,
+    ldflags: [
+        // Prevent the `trusty_memshare_vm_signed_bin_obj` segment from being garbage collected.
+        "-Wl,--no-gc-sections",
+        // Prevent the build ID segments from being added, as it would corrupt the integrity
+        // of the original signed image.
+        "-Wl,--build-id=none",
+        // Use a standard page size of 4096, smaller than the default 16384, to avoid padding
+        // with extra bytes.
+        "-Wl,-z,max-page-size=4096",
+        // Disable the packing of dynamic relocations. By default, the linker may
+        // create a `.rela.dyn` section. The presence of this extra loadable ELF
+        // section corrupts the integrity of the security VM, preventing it from
+        // loading. This flag prevents the creation of that section.
+        "-Wl,--pack-dyn-relocs=none",
+    ],
+    sanitize: {
+        memtag_heap: false,
+        memtag_stack: false,
+        memtag_globals: false,
+    },
+    nocrt: true,
+    no_libcrt: true,
+    static_executable: true,
+    system_shared_libs: [],
+    strip: {
+        none: true,
+    },
+    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+        ("android", "arm64", true): true,
+        ("android", "x86_64", true): false,
+        (default, default, default): false,
+    }),
+}
+
+cc_genrule {
+    name: "memshare_vm.S",
+    arch: {
+        arm64: {
+            srcs: [":trusty_memshare_vm_signed_bin"],
+        },
+    },
+    out: ["memshare_vm.S"],
+    cmd: "(" +
+        "    echo '.section .vm_payload_signed.bin';" +
+        "    echo '.globl vm_payload_signed';" +
+        "    echo 'vm_payload_signed:';" +
+        "    echo '.incbin \"'$(in)'\"';" +
+        ") > $(out)",
+    visibility: ["//visibility:private"],
+    //vendor_available: true,
+    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+        ("android", "arm64", true): true,
+        ("android", "x86_64", true): false,
+        (default, default, default): false,
+    }),
+}
+
+cc_object {
+    name: "trusty_memshare_vm_signed_bin_obj",
+    srcs: [
+        ":memshare_vm.S",
+    ],
+    crt: false,
+    //vendor_available: true,
+    static_libs: ["trusty_memshare_vm_signed_bin"],
+    system_shared_libs: [],
+    visibility: ["//visibility:private"],
+    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+        ("android", "arm64", true): true,
+        ("android", "x86_64", true): false,
+        (default, default, default): false,
+    }),
+}
+
+filegroup {
+    name: "trusty_vm_sign_key",
+    srcs: [":avb_testkey_rsa4096"],
+}
+
+// python -c "import hashlib; print(hashlib.sha256(b'trusty_memshare_vm_salt').hexdigest())"
+trusty_memshare_vm_salt = "48aa7d1499c26a7762835c9ff4e2767d1e0a587562a2d7d3b740b89e1d31a972"
+
+TRUSTY_MEMSHARE_VM_VERSION = 1
+
+avb_add_hash_footer {
+    name: "trusty_memshare_vm_signed_bin",
+    filename: "trusty_memshare_vm_signed.bin",
+    partition_name: "boot",
+    private_key: ":trusty_vm_sign_key",
+    salt: trusty_memshare_vm_salt,
+    rollback_index: TRUSTY_MEMSHARE_VM_VERSION,
+    props: [
+        {
+            name: "com.android.virt.cap",
+            value: "trusty_security_vm",
+        },
+        {
+            name: "com.android.virt.name",
+            value: "trusty_memshare_vm",
+        },
+    ],
+    src: ":trusty_memshare_vm_unsigned",
+    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+        ("android", "arm64", true): true,
+        ("android", "x86_64", true): false,
+        (default, default, default): false,
+    }),
+}
+
+prebuilt_etc {
+    name: "trusty_memshare_vm_launcher.rc.system",
+    src: select((os(), arch()), {
+        ("android", "arm64"): "memshare_vm_launcher-arm64.system.rc",
+        (default, default): ":empty_file",
+    }),
+    filename: "trusty_memshare_vm_launcher.rc",
+    relative_install_path: "init",
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "trusty_memshare_vm_rpc_services.json.system",
+    src: "memshare_vm_rpc_services.json",
+    system_ext_specific: true,
+    relative_install_path: "vm/trusty_vm",
+    filename: "memshare_vm_rpc_services.json",
+}
+
+genrule {
+    name: "memshare_vm_instance_id_system",
+    srcs: ["memshare_vm_instance_id_config.system.json"],
+    out: ["memshare_vm_instance_id"],
+    tools: [
+        "gen_instance_id_for_vm_with_trusted_hal",
+    ],
+    cmd: "$(location gen_instance_id_for_vm_with_trusted_hal) -i $(in) -o $(out)",
+}
+
+prebuilt_etc {
+    name: "trusty_memshare_vm_instance_id.system",
+    src: ":memshare_vm_instance_id_system",
+    system_ext_specific: true,
+    relative_install_path: "vm/trusty_vm",
+    filename: "memshare_vm_instance_id",
+}
+
+prebuilt_etc {
+    name: "early_vms_memshare.xml",
+    filename: "early_vms_memshare.xml",
+    src: "early_vms_memshare.xml",
+    relative_install_path: "avf",
+    system_ext_specific: true,
+}

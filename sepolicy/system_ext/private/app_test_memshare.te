@@ -1,0 +1,7 @@
+type app_test_memshare, domain, coredomain;
+type app_test_memshare_exec, exec_type, system_file_type, file_type;
+
+allow memshare_trusty_vm_launcher accessor_cmd_processor_service:service_manager { find };
+allow memshare_trusty_vm_launcher trusty_memshare_service:service_manager { find };
+
+binder_use(app_test_memshare)
