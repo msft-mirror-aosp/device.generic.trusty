@@ -190,7 +190,6 @@ TRUSTY_SYSTEM_VM_INCLUDE_MEMSHARE_EXAMPLE ?= false
 KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
 TRUSTY_KEYMINT_IMPL ?= rust
 TRUSTY_SYSTEM_VM ?= enabled
-GATEKEEPER_HAL_VENDOR_FROM_SECURITY_VM_SELECT ?= true
 ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
     $(call soong_config_set_bool, trusty_system_vm, placeholder_trusted_hal, true)
 endif
