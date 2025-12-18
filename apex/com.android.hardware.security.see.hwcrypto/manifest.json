@@ -1,0 +1,5 @@
+{
+  "name": "com.android.hardware.security.see.hwcrypto",
+  "version": 1,
+  "bootstrap": true
+}
