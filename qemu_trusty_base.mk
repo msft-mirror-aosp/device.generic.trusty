@@ -192,6 +192,7 @@ TRUSTY_SYSTEM_VM_INCLUDE_MEMSHARE_EXAMPLE ?= false
 KEYMINT_HAL_VENDOR_APEX_SELECT ?= true
 TRUSTY_KEYMINT_IMPL ?= rust
 TRUSTY_SYSTEM_VM ?= enabled
+GATEKEEPER_HAL_VENDOR_APEX_SELECT ?= true
 ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
     $(call soong_config_set_bool, trusty_system_vm, placeholder_trusted_hal, true)
 endif
@@ -207,6 +208,7 @@ $(call soong_config_set_bool, trusty_system_vm, keymint_reprovisioning_via_hal, 
 
 $(call inherit-product, packages/modules/Virtualization/guest/trusty/security_vm/security_vm.mk)
 
+$(call inherit-product, device/generic/trusty/apex/com.android.hardware.gatekeeper/trusty-apex.mk)
 $(call inherit-product, device/generic/trusty/apex/com.android.hardware.keymint/trusty-apex.mk)
 $(call inherit-product, device/generic/trusty/apex/com.android.hardware.security.see.hwcrypto/trusty-hwcryptohal-apex.mk)
 $(call inherit-product, system/core/trusty/trusty-base.mk)
@@ -237,3 +239,4 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.adb.secure=0 \
     ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee \
     ro.boot.vendor.apex.com.android.hardware.security.see.hwcrypto=com.android.hardware.security.see.hwcrypto.trusty_tee.without_shared_secret \
+    ro.boot.vendor.apex.com.android.hardware.gatekeeper=com.android.hardware.gatekeeper.trusty_tee \
