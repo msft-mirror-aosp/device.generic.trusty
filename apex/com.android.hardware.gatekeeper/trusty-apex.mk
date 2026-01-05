@@ -13,5 +13,7 @@
 # limitations under the License.
 
 ifeq ($(GATEKEEPER_HAL_VENDOR_APEX_SELECT),true)
-    PRODUCT_PACKAGES += com.android.hardware.gatekeeper.trusty_tee
+PRODUCT_PACKAGES += \
+    com.android.hardware.gatekeeper.trusty_tee \
+    com.android.hardware.gatekeeper.trusty_security_vm
 endif

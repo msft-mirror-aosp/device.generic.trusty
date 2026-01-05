@@ -32,3 +32,9 @@ apex {
     defaults: ["com.android.hardware.gatekeeper.trusty.apex_defaults"],
     prebuilts: ["android.hardware.gatekeeper-service.trusty_tee.xml"],
 }
+
+apex {
+    name: "com.android.hardware.gatekeeper.trusty_security_vm",
+    defaults: ["com.android.hardware.gatekeeper.trusty.apex_defaults"],
+    prebuilts: ["android.hardware.gatekeeper-service.security_vm.xml"],
+}
