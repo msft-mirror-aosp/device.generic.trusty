@@ -6,3 +6,6 @@ ro.vendor.persist.status u:object_r:vendor_persist_prop:s0 exact string
 
 # IBootControl Mock
 ro.boot.vendor.mock_boot_ctrl.*         u:object_r:vendor_mock_boot_props:s0
+
+# HwCrypto HAL, used by android.hardware.trusty.hwcryptohal-service service
+ro.vendor.trusty.hwcryptohal.register_shared_secret u:object_r:vendor_hwcryptohal_prop:s0

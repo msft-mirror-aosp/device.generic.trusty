@@ -1,0 +1,1 @@
+get_prop(hal_hwcrypto_default, vendor_hwcryptohal_prop)

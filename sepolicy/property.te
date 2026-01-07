@@ -6,3 +6,6 @@ vendor_internal_prop(vendor_persist_prop)
 
 # Slots mock IBootControl uses and whether they're active/booted successfully
 vendor_internal_prop(vendor_mock_boot_props)
+
+# Enable ISharedSecret/hwcrypto HAL backed by HwCrypto
+vendor_internal_prop(vendor_hwcryptohal_prop)
