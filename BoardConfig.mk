@@ -31,6 +31,7 @@ TARGET_2ND_CPU_VARIANT := generic
 
 BOARD_SEPOLICY_DIRS += device/generic/trusty/sepolicy
 
+BOARD_SEPOLICY_DIRS += device/generic/trusty/custom_vm/sepolicy
 
 # We want goldfish build configuration information, but not the resulting
 # QEMU images. QEMU_CUSTOMIZATIONS turns this on without building the images

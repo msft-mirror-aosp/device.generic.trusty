@@ -1,0 +1,30 @@
+type memshare_trusty_vm_launcher_vendor, domain;
+type memshare_trusty_vm_launcher_vendor_exec, exec_type, vendor_file_type, file_type;
+type memshare_trusty_vm_launcher_vendor_tmpfs, file_type;
+
+allow memshare_trusty_vm_launcher_vendor accessor_cmd_processor_service:service_manager { find add };
+allow memshare_trusty_vm_launcher_vendor trusty_cmd_processor_service:service_manager { find add };
+
+allow memshare_trusty_vm_launcher_vendor accessor_mem_share_service:service_manager { find add };
+allow memshare_trusty_vm_launcher_vendor trusty_mem_share_service:service_manager { find };
+
+allow memshare_trusty_vm_launcher_vendor trusty_memshare_service:service_manager { find add };
+
+init_daemon_domain(memshare_trusty_vm_launcher_vendor)
+domain_auto_trans(init, memshare_trusty_vm_launcher_vendor_exec, memshare_trusty_vm_launcher_vendor)
+
+binder_use(memshare_trusty_vm_launcher_vendor)
+
+allow memshare_trusty_vm_launcher_vendor kmsg_debug_device:chr_file rw_file_perms;
+use_bootstrap_libs(memshare_trusty_vm_launcher_vendor)
+
+allow memshare_trusty_vm_launcher_vendor self:global_capability_class_set { net_bind_service ipc_lock sys_resource ipc_owner };
+
+tmpfs_domain(memshare_trusty_vm_launcher_vendor)
+
+allow memshare_trusty_vm_launcher_vendor hypervisor_prop:file { read open getattr map };
+allow memshare_trusty_vm_launcher_vendor virtualizationmanager_exec:file { read open execute execute_no_trans map getattr };
+
+allow memshare_trusty_vm_launcher_vendor virtualization_service:service_manager find;
+
+virtualizationservice_vendor_use(memshare_trusty_vm_launcher_vendor);
