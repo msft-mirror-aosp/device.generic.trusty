@@ -3,7 +3,7 @@ package {
 }
 
 cc_defaults {
-    name: "app.test.defaults",
+    name: "memshare_app.defaults",
     shared_libs: [
         "libbase",
         "liblog",
@@ -17,15 +17,18 @@ cc_defaults {
         "-Wall",
         "-Werror",
     ],
-    srcs: [
-        "main.cpp",
+    visibility: [
+        "//vendor:__subpackages__", // for vendor use
     ],
 }
 
 cc_binary {
-    name: "app.test.system",
+    name: "memshare_app.system",
     defaults: [
-        "app.test.defaults",
+        "memshare_app.defaults",
+    ],
+    srcs: [
+        "main.cpp",
     ],
     system_ext_specific: true,
 }
