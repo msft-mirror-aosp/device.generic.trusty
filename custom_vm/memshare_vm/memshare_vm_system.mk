@@ -14,12 +14,15 @@
 
 # This is the default set of packages to load the trusty memshare vm.
 # It can be overridden by device-specific configuration.
+PRODUCT_SOONG_NAMESPACES += \
+    device/generic/trusty/custom_vm \
+
 TRUSTY_MEMSHARE_VM_PRODUCT_PACKAGES ?= trusty_memshare_vm.elf.system \
 	memshare_trusty_vm_launcher_system \
 	trusty_memshare_vm_launcher.rc.system \
 	trusty_memshare_vm_instance_id.system \
 	trusty_memshare_vm_rpc_services.json.system \
-	app.test.system \
+	memshare_app.system \
 	early_vms_memshare.xml \
 
 PRODUCT_PACKAGES += $(TRUSTY_MEMSHARE_VM_PRODUCT_PACKAGES)

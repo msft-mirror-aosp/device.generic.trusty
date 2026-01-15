@@ -25,6 +25,11 @@ aidl_interface {
     unstable: true,
     vendor_available: true,
     owner: "aosp",
+    visibility: [
+        "//system/tools/aidl/build",
+        "//device/generic/trusty/custom_vm:__subpackages__",
+        "//vendor:__subpackages__", // for vendor use
+    ],
 }
 
 aidl_interface {
@@ -54,4 +59,19 @@ aidl_interface {
     vendor_available: true,
     owner: "aosp",
     frozen: false,
+    visibility: [
+        "//system/tools/aidl/build",
+        "//device/generic/trusty/custom_vm:__subpackages__",
+        "//vendor:__subpackages__", // for vendor use,
+    ],
+}
+
+cc_defaults {
+    name: "android.trusty.cmdprocessor_latest_cpp",
+    shared_libs: [
+        "android.trusty.cmdprocessor-cpp",
+    ],
+    visibility: [
+        "//vendor:__subpackages__", // for vendor use
+    ],
 }
