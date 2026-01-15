@@ -84,6 +84,7 @@ PRODUCT_PACKAGES += \
     strace \
     system-build.prop \
     toolbox \
+    toolbox_ramdisk \
     toybox \
     traced \
     traced_probes \
