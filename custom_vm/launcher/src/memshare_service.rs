@@ -22,16 +22,8 @@ use android_trusty_membuf::aidl::android::trusty::membuf::{
     IMemoryBufferShare::SECURE_VIDEO_DECODER_INPUT, IMemoryBufferShareVm::IMemoryBufferShareVm,
     MemoryBufferToken::MemoryBufferToken, ShareMemoryBufferResult::ShareMemoryBufferResult,
 };
-#[cfg(android_vendor)]
-use avf_bindgen::{
-    AVirtualMachineMemoryMappingAttributes, AVirtualMachine_addMemoryMapping,
-    AVirtualMachine_removeMemoryMapping,
-};
 use binder::{self, AccessorProvider, ParcelFileDescriptor, Status, StatusCode, Strong};
-#[cfg(not(android_vendor))]
 use std::fs::File;
-#[cfg(android_vendor)]
-use std::os::fd::AsRawFd;
 use std::sync::{Mutex, OnceLock};
 
 use thiserror::Error;
@@ -44,9 +36,6 @@ static ACCESSOR_PROVIDER: OnceLock<Option<AccessorProvider>> = OnceLock::new();
 static MEMORY_SHARE_VM_SERVICE: OnceLock<Result<Strong<dyn IMemoryBufferShareVm>, MemShareError>> =
     OnceLock::new();
 static MEMORY_MANAGER: OnceLock<Mutex<MemoryManager>> = OnceLock::new();
-
-#[cfg(not(android_vendor))]
-const ERROR_MAPPING_MEMORY: i32 = -1;
 
 #[derive(Clone, Error, Debug)]
 pub enum MemShareError {
@@ -221,42 +210,6 @@ struct MemoryBufferContextData {
     ta_memory_buffer_ctx: Option<Strong<dyn IMemoryBufferContext>>,
 }
 
-#[cfg(android_vendor)]
-fn remove_memory_mapping(dma_buffer_id: i32) -> Result<(), MemShareError> {
-    let vm = crate::MEMSHARE_VM.get().ok_or_else(|| {
-        log::error!("MemShare VM object was not available");
-        MemShareError::InvalidState
-    })?;
-    let vm_obj = vm
-        .lock()
-        .map_err(|e| {
-            log::error!("Couldn't lock vm object: {:?}", e);
-            MemShareError::InvalidState
-        })?
-        .0;
-    // SAFETY: vm_obj is a valid pointer returned by AVirtualMachine_createRaw.dma_buffer_id doesn't
-    // affect the safety of the call.
-    let mapping_removed = unsafe { AVirtualMachine_removeMemoryMapping(vm_obj, dma_buffer_id) };
-    if !mapping_removed {
-        log::error!("couldn't remove DMA buffer");
-        return Err(MemShareError::BufferMappingProblem);
-    };
-    Ok(())
-}
-
-#[cfg(not(android_vendor))]
-fn remove_memory_mapping(dma_buffer_id: i32) -> Result<(), MemShareError> {
-    let vm = crate::MEMSHARE_VM.get().ok_or_else(|| {
-        log::error!("MemShare VM object was not available");
-        MemShareError::InvalidState
-    })?;
-    vm.remove_memory_mapping(dma_buffer_id).map_err(|e| {
-        log::error!("couldn't remove DMA buffer: {:?}", e);
-        MemShareError::BufferMappingProblem
-    })?;
-    Ok(())
-}
-
 impl MemoryBufferContextData {
     fn new(
         dma_buffer_id: i32,
@@ -286,7 +239,14 @@ impl MemoryBufferContextData {
             })?;
         }
         if let Some(dma_buffer_id) = self.dma_buffer_id.take() {
-            remove_memory_mapping(dma_buffer_id)?;
+            let vm = crate::MEMSHARE_VM.get().ok_or_else(|| {
+                log::error!("MemShare VM object was not available");
+                MemShareError::InvalidState
+            })?;
+            vm.remove_memory_mapping(dma_buffer_id).map_err(|e| {
+                log::error!("couldn't remove DMA buffer: {:?}", e);
+                MemShareError::BufferMappingProblem
+            })?;
         }
         if let Some(memory_range) = self.memory_range.take() {
             let range_max_size = MemoryManager::get_buffer_max_size(memory_range.protection_id)?;
@@ -407,7 +367,7 @@ fn get_mem_share_vm_service() -> Result<Strong<dyn IMemoryBufferShareVm>, MemSha
                 MemShareError::BinderError("Couldn't get IMemoryShareVM service".to_string())
             })
         })
-        .clone()
+        .clone() //.expect("failed to get Share Memory VM interface from accessor")).clone()
 }
 
 struct MemoryBufferShare;
@@ -474,51 +434,6 @@ pub(crate) fn register_memshare_service() -> Result<(), StatusCode> {
     binder::add_service(SERVICE_NAME, MemoryBufferShare::new_binder().as_binder())
 }
 
-#[cfg(android_vendor)]
-fn add_memory_mapping(
-    fd: &ParcelFileDescriptor,
-    range_ipa_start: u64,
-    range_ipa_end: u64,
-) -> Result<i32, MemShareError> {
-    let vm = crate::MEMSHARE_VM.get().ok_or_else(|| {
-        log::error!("MemShare VM object was not available");
-        MemShareError::InvalidState
-    })?;
-    let vm_obj = vm
-        .lock()
-        .map_err(|e| {
-            log::error!("Couldn't lock vm object: {:?}", e);
-            MemShareError::InvalidState
-        })?
-        .0;
-    // SAFETY: vm_obj is a valid pointer returned by AVirtualMachine_createRaw
-    let dma_buffer_id = unsafe {
-        AVirtualMachine_addMemoryMapping(vm_obj, fd.as_raw_fd(), range_ipa_start, range_ipa_end, 0, AVirtualMachineMemoryMappingAttributes::AVIRTUAL_MACHINE_MEMORY_MAPPING_ATTRIBUTE_CACHE_COHERENT)
-    };
-    Ok(dma_buffer_id)
-}
-
-#[cfg(not(android_vendor))]
-fn add_memory_mapping(
-    fd: &ParcelFileDescriptor,
-    range_ipa_start: u64,
-    range_ipa_end: u64,
-) -> Result<i32, MemShareError> {
-    let file = get_file_from_fd(fd)?;
-    let vm = crate::MEMSHARE_VM.get().ok_or_else(|| {
-        log::error!("MemShare VM object was not available");
-        MemShareError::InvalidState
-    })?;
-    match vm.add_memory_mapping(file, range_ipa_start, range_ipa_end, 0, true) {
-        Ok(dma_buffer_id) => Ok(dma_buffer_id),
-        Err(e) => {
-            log::error!("Error received when mapping buffer: {:?}", e);
-            // Will return a negative number so caller will do cleanup before returning error
-            Ok(ERROR_MAPPING_MEMORY)
-        }
-    }
-}
-
 fn map_memory_buffer(
     fd: &ParcelFileDescriptor,
     size_bytes: i32,
@@ -530,11 +445,28 @@ fn map_memory_buffer(
         return Err(MemShareError::InvalidValue);
     }
     let protection_id: ProtectionId = protection_id.try_into()?;
+    let file = get_file_from_fd(fd)?;
     let memory_manager = MEMORY_MANAGER.get_or_init(|| Mutex::new(MemoryManager::new()));
     let (range_ipa_start, range_ipa_end) =
         memory_manager.lock().expect("poisoned mutex").get_map_area(size_bytes, protection_id)?;
-    log::info!("Mapping fd {fd:?} at start: {range_ipa_start:#x} end: {range_ipa_end:#x}");
-    let dma_buffer_id = add_memory_mapping(fd, range_ipa_start, range_ipa_end)?;
+    let vm = crate::MEMSHARE_VM.get().ok_or_else(|| {
+        log::error!("MemShare VM object was not available");
+        MemShareError::InvalidState
+    })?;
+    log::info!("Mapping fd {file:?} at start: {range_ipa_start:#x} end: {range_ipa_end:#x}");
+    let dma_buffer_id =
+        vm.add_memory_mapping(file, range_ipa_start, range_ipa_end, 0, true).map_err(|e| {
+            log::error!("Error received when mapping buffer: {:?}", e);
+            let add_area_result = memory_manager.lock().expect("poisoned mutex").add_area(
+                protection_id,
+                range_ipa_start,
+                range_ipa_end - range_ipa_start,
+            );
+            if add_area_result.is_err() {
+                log::error!("couldn't return memory area to manager: {:?}", e);
+            }
+            MemShareError::BufferMappingProblem
+        })?;
     if dma_buffer_id < 0 {
         log::error!("Couldn't add dma buffer. Received: {}", dma_buffer_id);
         memory_manager.lock().expect("poisoned mutex").add_area(
@@ -549,7 +481,6 @@ fn map_memory_buffer(
     Ok(mem_buf_ctx)
 }
 
-#[cfg(not(android_vendor))]
 fn get_file_from_fd(fd: &ParcelFileDescriptor) -> Result<File, MemShareError> {
     let dup_fd = fd.as_ref().try_clone().map_err(|e| {
         log::error!("Couldn't duplicate pfd: {:?}", e);
