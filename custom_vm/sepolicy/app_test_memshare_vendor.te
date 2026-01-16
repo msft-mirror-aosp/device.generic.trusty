@@ -1,0 +1,13 @@
+type app_test_memshare_vendor, domain;
+type app_test_memshare_vendor_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(app_test_memshare_vendor)
+binder_use(app_test_memshare_vendor)
+virtualizationservice_vendor_use(app_test_memshare_vendor);
+
+allow app_test_memshare_vendor accessor_cmd_processor_service:service_manager { find add };
+allow app_test_memshare_vendor accessor_mem_share_service:service_manager { find add };
+allow app_test_memshare_vendor trusty_memshare_service:service_manager { find add };
+allow app_test_memshare_vendor trusty_mem_share_service:service_manager find;
+
+allow app_test_memshare_vendor kmsg_debug_device:chr_file rw_file_perms;
