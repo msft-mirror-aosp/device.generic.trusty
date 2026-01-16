@@ -32,3 +32,21 @@ cc_binary {
     ],
     system_ext_specific: true,
 }
+
+cc_binary {
+    name: "memshare_app.vendor",
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libbinder_ndk",
+        "libutils",
+        "android.trusty.cmdprocessor-ndk",
+        "android.trusty.membuf-ndk",
+        "android.trusty.cmdprocessor-cpp",
+        "android.trusty.membuf-cpp",
+    ],
+    srcs: [
+        "main_vendor.cpp",
+    ],
+    vendor: true,
+}
