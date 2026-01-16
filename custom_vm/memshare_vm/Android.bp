@@ -54,6 +54,7 @@ cc_binary {
         memtag_heap: false,
         memtag_stack: false,
         memtag_globals: false,
+        hwaddress: false,
     },
     nocrt: true,
     no_libcrt: true,
