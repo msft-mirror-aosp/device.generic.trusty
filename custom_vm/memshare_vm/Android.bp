@@ -70,6 +70,7 @@ cc_binary {
         memtag_heap: false,
         memtag_stack: false,
         memtag_globals: false,
+        hwaddress: false,
     },
     // disabling xom was found to be a fix for a compile error on b/469548325. xom definition
     // can be found on b/441041342
