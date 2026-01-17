@@ -41,3 +41,18 @@ rust_binary {
     ],
     system_ext_specific: true,
 }
+
+rust_binary {
+    name: "memshare_trusty_vm_launcher_vendor",
+    crate_name: "memshare_trusty_vm_launcher_vendor",
+    defaults: [
+        "memshare_trusty_vm_launcher_defaults",
+    ],
+    rustlibs: [
+        "librustutils",
+        "liblibc",
+        "libnix",
+    ],
+    srcs: ["src/main_vendor.rs"],
+    vendor: true,
+}
