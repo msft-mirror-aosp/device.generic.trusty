@@ -30,7 +30,7 @@ use serde::Deserialize;
 use std::ffi::CString;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Write};
-use std::os::fd::IntoRawFd;
+use std::os::fd::{AsRawFd, IntoRawFd};
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
@@ -112,7 +112,7 @@ fn main() -> Result<()> {
         instance_id
     };
     let console_out = create_log_writer(&args.name)?;
-    let _log_out = console_out.try_clone().context("Failed to clone console_out fd for log_out")?;
+    let log_out = console_out.try_clone().context("Failed to clone console_out fd for log_out")?;
     // SAFETY: AVirtualMachineRawConfig_create() isn't unsafe but rust_bindgen forces it to be seen
     // as unsafe
     let config = unsafe { AVirtualMachineRawConfig_create() };
@@ -143,9 +143,11 @@ fn main() -> Result<()> {
         // SAFETY: &mut vm is a valid pointer to *AVirtualMachine
         unsafe {
             AVirtualMachine_createRaw(
-                service, config, -1, // console_in
-                -1, // console_out
-                -1, // log
+                service,
+                config,
+                console_out.as_raw_fd(), // console_out
+                -1,                      // console_in
+                log_out.as_raw_fd(),     // log
                 &mut vm,
             )
         } == 0,
