@@ -11,22 +11,6 @@ package {
 // see packages/modules/Virtualization/guest/trusty
 
 prebuilt_etc {
-    name: "trusty_memshare_vm.elf.system",
-    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
-        ("android", "arm64", true): true,
-        ("android", "x86_64", true): false,
-        (default, default, default): false,
-    }),
-    src: select((os(), arch()), {
-        ("android", "arm64"): ":trusty_memshare_vm_signed",
-        (default, default): ":empty_file",
-    }),
-    system_ext_specific: true,
-    relative_install_path: "vm/trusty_vm",
-    filename: "trusty_memshare_vm.elf",
-}
-
-prebuilt_etc {
     name: "trusty_memshare_vm.elf.vendor",
     enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
         ("android", "arm64", true): true,
@@ -163,30 +147,11 @@ avb_add_hash_footer {
 }
 
 prebuilt_etc {
-    name: "trusty_memshare_vm_launcher.rc.system",
-    src: select((os(), arch()), {
-        ("android", "arm64"): "memshare_vm_launcher-arm64.system.rc",
-        (default, default): ":empty_file",
-    }),
-    filename: "trusty_memshare_vm_launcher.rc",
-    relative_install_path: "init",
-    system_ext_specific: true,
-}
-
-prebuilt_etc {
     name: "trusty_memshare_vm_launcher.rc.vendor",
     src: "memshare_vm_launcher-arm64.vendor.rc",
     filename: "memshare_vm_launcher-arm64.vendor.rc",
     relative_install_path: "init",
     vendor: true,
-}
-
-prebuilt_etc {
-    name: "trusty_memshare_vm_rpc_services.json.system",
-    src: "memshare_vm_rpc_services.json",
-    system_ext_specific: true,
-    relative_install_path: "vm/trusty_vm",
-    filename: "memshare_vm_rpc_services.json",
 }
 
 prebuilt_etc {
@@ -198,26 +163,8 @@ prebuilt_etc {
 }
 
 genrule {
-    name: "memshare_vm_instance_id_system",
-    srcs: ["memshare_vm_instance_id_config.system.json"],
-    out: ["memshare_vm_instance_id"],
-    tools: [
-        "gen_instance_id_for_vm_with_trusted_hal",
-    ],
-    cmd: "$(location gen_instance_id_for_vm_with_trusted_hal) -i $(in) -o $(out)",
-}
-
-prebuilt_etc {
-    name: "trusty_memshare_vm_instance_id.system",
-    src: ":memshare_vm_instance_id_system",
-    system_ext_specific: true,
-    relative_install_path: "vm/trusty_vm",
-    filename: "memshare_vm_instance_id",
-}
-
-genrule {
     name: "memshare_vm_instance_id_vendor",
-    srcs: ["memshare_vm_instance_id_config.vendor.json"],
+    srcs: ["memshare_vm_instance_id_config.json"],
     out: ["memshare_vm_instance_id"],
     tools: [
         "gen_instance_id_for_vm_with_trusted_hal",
@@ -231,12 +178,4 @@ prebuilt_etc {
     vendor: true,
     relative_install_path: "vm/trusty_vm",
     filename: "memshare_vm_instance_id",
-}
-
-prebuilt_etc {
-    name: "early_vms_memshare.xml",
-    filename: "early_vms_memshare.xml",
-    src: "early_vms_memshare.xml",
-    relative_install_path: "avf",
-    system_ext_specific: true,
 }
