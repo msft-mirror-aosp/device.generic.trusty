@@ -1,7 +1,10 @@
+subsystem virtio-ports
+  devname sys_name
+  dirname /dev/vport
+
 /dev/ion                  0660   system     system
 /dev/block/vdf            0600   system     system
 /dev/block/vdg            0600   system     system
-/dev/vport[0-9]*p1        0660   system     system
-/dev/vport[0-9]*p2        0660   system     system
+/dev/vport/*              0660   system     system
 /dev/trusty-ipc-dev0      0660   system     drmrpc
 /dev/trusty-log0          0660   system     system
