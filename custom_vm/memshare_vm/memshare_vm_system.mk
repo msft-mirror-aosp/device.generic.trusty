@@ -22,7 +22,6 @@ TRUSTY_MEMSHARE_VM_PRODUCT_PACKAGES ?= trusty_memshare_vm.elf.system \
 	memshare_trusty_vm_launcher_vendor \
 	trusty_memshare_vm_launcher.rc.vendor \
 	trusty_memshare_vm_instance_id.system \
-	trusty_memshare_vm_instance_id.vendor \
 	trusty_memshare_vm_rpc_services.json.vendor \
 	memshare_app.vendor \
 	early_vms_memshare.xml \
