@@ -3,6 +3,7 @@ service trusty_vendor_memshare_vm_launcher /vendor/bin/memshare_trusty_vm_launch
 --name vendor_memshare_vm \
 --kernel /vendor/etc/vm/trusty_vm/trusty_memshare_vm.elf \
 --rpc-services-config /vendor/etc/vm/trusty_vm/memshare_vm_rpc_services.json \
+--vm-instance-id /vendor/etc/vm/trusty_vm/memshare_vm_instance_id \
 --memory-size-mib 32 \
 --protected
     class hal
