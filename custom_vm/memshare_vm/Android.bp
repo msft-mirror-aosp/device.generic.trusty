@@ -215,24 +215,6 @@ prebuilt_etc {
     filename: "memshare_vm_instance_id",
 }
 
-genrule {
-    name: "memshare_vm_instance_id_vendor",
-    srcs: ["memshare_vm_instance_id_config.vendor.json"],
-    out: ["memshare_vm_instance_id"],
-    tools: [
-        "gen_instance_id_for_vm_with_trusted_hal",
-    ],
-    cmd: "$(location gen_instance_id_for_vm_with_trusted_hal) -i $(in) -o $(out)",
-}
-
-prebuilt_etc {
-    name: "trusty_memshare_vm_instance_id.vendor",
-    src: ":memshare_vm_instance_id_vendor",
-    vendor: true,
-    relative_install_path: "vm/trusty_vm",
-    filename: "memshare_vm_instance_id",
-}
-
 prebuilt_etc {
     name: "early_vms_memshare.xml",
     filename: "early_vms_memshare.xml",
