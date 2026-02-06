@@ -51,6 +51,7 @@ PRODUCT_PACKAGES += \
     com.android.os.statsd \
     com.android.runtime \
     com.android.sdkext \
+    com.android.tethering \
     dhcpclient \
     etc_hosts \
     gatekeeperd \
