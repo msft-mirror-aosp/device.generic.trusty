@@ -51,6 +51,7 @@ PRODUCT_PACKAGES += \
     com.android.os.statsd \
     com.android.runtime \
     com.android.sdkext \
+    com.android.tethering \
     dhcpclient \
     etc_hosts \
     gatekeeperd \
@@ -218,7 +219,7 @@ $(call inherit-product, system/core/trusty/trusty-test.mk)
 $(call inherit-product-if-exists, trusty/vendor/google/proprietary/device/device.mk)
 
 ifeq ($(TRUSTY_SYSTEM_VM_INCLUDE_MEMSHARE_EXAMPLE),true)
-    $(call inherit-product, device/generic/trusty/custom_vm/memshare_vm/memshare_vm_system.mk)
+    $(call inherit-product, device/generic/trusty/custom_vm/memshare_vm/memshare_vm_vendor.mk)
 endif
 
 # Test Utilities
