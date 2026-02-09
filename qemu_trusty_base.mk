@@ -238,6 +238,7 @@ PRODUCT_PACKAGES += \
     VtsHalRemotelyProvisionedComponentTargetTest \
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    hypervisor.memory_share.supported=1 \
     ro.adb.secure=0 \
     ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee \
     ro.boot.vendor.apex.com.android.hardware.security.see.hwcrypto=com.android.hardware.security.see.hwcrypto.trusty_tee.without_shared_secret \
