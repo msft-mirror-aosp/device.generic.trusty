@@ -218,6 +218,10 @@ $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-test.mk)
 $(call inherit-product-if-exists, trusty/vendor/google/proprietary/device/device.mk)
 
+
+# Trusty vendor VMs
+$(call soong_config_set_bool, trusty_vendor_vm, enabled, true)
+$(call soong_config_set, trusty_vendor_vm, buildtype, $(TARGET_BUILD_VARIANT))
 ifeq ($(TRUSTY_SYSTEM_VM_INCLUDE_MEMSHARE_EXAMPLE),true)
     $(call inherit-product, device/generic/trusty/custom_vm/memshare_vm/memshare_vm_vendor.mk)
 endif
