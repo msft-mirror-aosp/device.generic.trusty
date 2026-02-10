@@ -53,7 +53,7 @@ apex_defaults {
     name: "com.android.hardware.keymint.trusty_system_vm.apex_defaults",
     prebuilts: [
         // vintf fragments
-        "android.hardware.security.keymint-service.trusty_system_vm.xml",
+        "android.hardware.security.keymint-service.security_vm.xml",
     ],
 }
 
