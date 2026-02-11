@@ -17,6 +17,8 @@
 PRODUCT_SOONG_NAMESPACES += \
     device/generic/trusty/custom_vm \
 
+BOARD_SEPOLICY_DIRS += device/generic/trusty/custom_vm/sepolicy
+
 TRUSTY_MEMSHARE_VM_PRODUCT_PACKAGES ?= \
 	trusty_memshare_vm.elf.vendor \
 	memshare_trusty_vm_launcher_vendor \

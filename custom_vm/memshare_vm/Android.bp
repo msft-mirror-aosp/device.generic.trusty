@@ -12,7 +12,7 @@ package {
 
 prebuilt_etc {
     name: "trusty_memshare_vm.elf.vendor",
-    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+    enabled: select((os(), arch(), soong_config_variable("trusty_vendor_vm", "enabled")), {
         ("android", "arm64", true): true,
         ("android", "x86_64", true): false,
         (default, default, default): false,
@@ -67,7 +67,7 @@ cc_binary {
     strip: {
         none: true,
     },
-    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+    enabled: select((os(), arch(), soong_config_variable("trusty_vendor_vm", "enabled")), {
         ("android", "arm64", true): true,
         ("android", "x86_64", true): false,
         (default, default, default): false,
@@ -88,7 +88,7 @@ cc_genrule {
     cmd: "$(location gen_signed_vm_assembly_file) $(in) $(out)",
     visibility: ["//visibility:private"],
     vendor_available: true,
-    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+    enabled: select((os(), arch(), soong_config_variable("trusty_vendor_vm", "enabled")), {
         ("android", "arm64", true): true,
         (default, default, default): false,
     }),
@@ -104,7 +104,7 @@ cc_object {
     static_libs: ["trusty_memshare_vm_signed_bin"],
     system_shared_libs: [],
     visibility: ["//visibility:private"],
-    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+    enabled: select((os(), arch(), soong_config_variable("trusty_vendor_vm", "enabled")), {
         ("android", "arm64", true): true,
         ("android", "x86_64", true): false,
         (default, default, default): false,
@@ -139,7 +139,7 @@ avb_add_hash_footer {
         },
     ],
     src: ":trusty_memshare_vm_unsigned",
-    enabled: select((os(), arch(), soong_config_variable("trusty_system_vm", "enabled")), {
+    enabled: select((os(), arch(), soong_config_variable("trusty_vendor_vm", "enabled")), {
         ("android", "arm64", true): true,
         ("android", "x86_64", true): false,
         (default, default, default): false,

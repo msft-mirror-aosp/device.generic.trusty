@@ -218,6 +218,10 @@ $(call inherit-product, system/core/trusty/trusty-storage.mk)
 $(call inherit-product, system/core/trusty/trusty-test.mk)
 $(call inherit-product-if-exists, trusty/vendor/google/proprietary/device/device.mk)
 
+
+# Trusty vendor VMs
+$(call soong_config_set_bool, trusty_vendor_vm, enabled, true)
+$(call soong_config_set, trusty_vendor_vm, buildtype, $(TARGET_BUILD_VARIANT))
 ifeq ($(TRUSTY_SYSTEM_VM_INCLUDE_MEMSHARE_EXAMPLE),true)
     $(call inherit-product, device/generic/trusty/custom_vm/memshare_vm/memshare_vm_vendor.mk)
 endif
@@ -238,6 +242,7 @@ PRODUCT_PACKAGES += \
     VtsHalRemotelyProvisionedComponentTargetTest \
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    hypervisor.memory_share.supported=1 \
     ro.adb.secure=0 \
     ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee \
     ro.boot.vendor.apex.com.android.hardware.security.see.hwcrypto=com.android.hardware.security.see.hwcrypto.trusty_tee.without_shared_secret \
