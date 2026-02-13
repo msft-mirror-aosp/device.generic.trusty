@@ -247,3 +247,6 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee \
     ro.boot.vendor.apex.com.android.hardware.security.see.hwcrypto=com.android.hardware.security.see.hwcrypto.trusty_tee.without_shared_secret \
     ro.boot.vendor.apex.com.android.hardware.gatekeeper=com.android.hardware.gatekeeper.trusty_tee \
+
+PRODUCT_COPY_FILES += \
+    system/core/rootdir/ramdisk_node_list:$(TARGET_COPY_OUT_RAMDISK)/ramdisk_node_list
