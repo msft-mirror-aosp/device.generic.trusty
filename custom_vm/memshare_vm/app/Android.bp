@@ -22,6 +22,25 @@ cc_defaults {
     ],
 }
 
+cc_defaults {
+    name: "memshare_app.vendor.defaults",
+    defaults: [
+        "memshare_app.defaults",
+    ],
+    shared_libs: [
+        "android.trusty.cmdprocessor-ndk",
+        "android.trusty.membuf-ndk",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    vendor: true,
+    visibility: [
+        "//vendor:__subpackages__", // for vendor use
+    ],
+}
+
 cc_binary {
     name: "memshare_app.system",
     defaults: [
@@ -35,18 +54,10 @@ cc_binary {
 
 cc_binary {
     name: "memshare_app.vendor",
-    shared_libs: [
-        "libbase",
-        "liblog",
-        "libbinder_ndk",
-        "libutils",
-        "android.trusty.cmdprocessor-ndk",
-        "android.trusty.membuf-ndk",
-        "android.trusty.cmdprocessor-cpp",
-        "android.trusty.membuf-cpp",
+    defaults: [
+        "memshare_app.vendor.defaults",
     ],
     srcs: [
         "main_vendor.cpp",
     ],
-    vendor: true,
 }
