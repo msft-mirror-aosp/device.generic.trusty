@@ -200,7 +200,7 @@ ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
 endif
 
 $(call soong_config_set_bool, trusty_system_vm, enabled, true)
-$(call soong_config_set, trusty_system_vm, buildtype, $(TARGET_BUILD_VARIANT))
+$(call soong_config_set, trusty_system_vm, buildtype, user)
 $(call soong_config_set_bool, trusty_tee, enabled, true)
 
 # keymint_reprovisioning_via_hal shall only be enabled on test devices
