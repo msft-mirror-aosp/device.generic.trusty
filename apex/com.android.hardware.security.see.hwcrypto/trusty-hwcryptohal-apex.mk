@@ -15,3 +15,4 @@
 PRODUCT_PACKAGES += \
     com.android.hardware.security.see.hwcrypto.trusty_tee.without_shared_secret \
     com.android.hardware.security.see.hwcrypto.trusty_tee.shared_secret \
+    android.hardware.security.sharedsecret.security_vm_with_placeholder_thal \

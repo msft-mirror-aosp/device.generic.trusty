@@ -47,3 +47,13 @@ apex {
         "android.hardware.security.see.hwcrypto.sharedsecret-service.trusty.xml",
     ],
 }
+
+apex {
+    name: "android.hardware.security.sharedsecret.security_vm_with_placeholder_thal",
+    defaults: ["com.android.hardware.security.see.hwcrypto.apex_defaults"],
+    init_rc: ["android.hardware.security.sharedsecret.security_vm_with_placeholder_thal.rc"],
+    prebuilts: [
+        // vintf fragments
+        "android.hardware.security.hwcrypto.sharedsecret-service.trusty_system_vm_placeholders.xml",
+    ],
+}
