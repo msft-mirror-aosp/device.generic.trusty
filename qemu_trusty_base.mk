@@ -201,6 +201,10 @@ endif
 
 $(call soong_config_set_bool, trusty_system_vm, enabled, true)
 $(call soong_config_set, trusty_system_vm, buildtype, user)
+
+# TODO(b/487994455): remove `decouple_init_rc_from_keymint_hal` flag
+# once the AL config can be decoupled from trusty security VM config.
+$(call soong_config_set_bool, trusty_system_vm, decouple_init_rc_from_keymint_hal, true)
 $(call soong_config_set_bool, trusty_tee, enabled, true)
 
 # keymint_reprovisioning_via_hal shall only be enabled on test devices
