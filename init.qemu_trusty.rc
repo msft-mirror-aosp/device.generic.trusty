@@ -21,11 +21,6 @@ com.android.hardware.keymint.trusty_system_vm
     # Enable KeyMint that connects to the Trusty Security VM
     setprop trusty.security_vm.keymint.enabled 1
 
-# legacy cpp implementation through APEX
-on post-fs && property:ro.boot.vendor.apex.com.android.hardware.gatekeeper=\
-com.android.hardware.gatekeeper.trusty_tee
-    enable vendor.gatekeeper_tee
-
 on post-fs
     # Ensure rpmb_virt_device is ready and start storageproxyd
     # (on-post-fs at the latest because vold
