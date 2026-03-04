@@ -63,4 +63,5 @@ apex {
         "com.android.hardware.keymint.trusty.apex_defaults",
         "com.android.hardware.keymint.trusty_system_vm.apex_defaults",
     ],
+    init_rc: ["android.hardware.security.keymint-service.security_vm.rc"],
 }
