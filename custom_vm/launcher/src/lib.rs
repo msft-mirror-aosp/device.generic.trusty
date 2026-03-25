@@ -17,6 +17,7 @@
 use binder::ParcelFileDescriptor;
 use std::sync::OnceLock;
 
+pub mod allocator;
 pub mod memshare_service;
 
 pub use memshare_service::MemShareError;

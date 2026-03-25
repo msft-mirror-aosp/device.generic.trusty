@@ -15,6 +15,7 @@
 
 //! This module implements the IMemoryBufferShare Android side service.
 
+use crate::allocator::GapAllocator;
 use android_trusty_membuf::aidl::android::trusty::membuf::{
     IMemoryBufferContext::BnMemoryBufferContext, IMemoryBufferContext::IMemoryBufferContext,
     IMemoryBufferShare::BnMemoryBufferShare, IMemoryBufferShare::IMemoryBufferShare,
@@ -93,77 +94,35 @@ struct MemoryRange {
 }
 
 struct MemoryManager {
-    buffers: Vec<(u64, u64)>,
-    secure_buffers: Vec<(u64, u64)>,
+    host_allocator: GapAllocator,
+    secure_allocator: GapAllocator,
 }
 
 impl MemoryManager {
-    // For testing we will provide only 2 1 page buffers for now
-    const HOST_BUFFER_1_BASE_ADDRESS: u64 = 0x8000_0000 + 64 * 1024 * 1024;
-    const HOST_BUFFER_2_BASE_ADDRESS: u64 =
-        Self::HOST_BUFFER_1_BASE_ADDRESS + Self::HOST_BUFFER_MAX_SUPPORTED_SIZE;
-    const HOST_BUFFER_MAX_SUPPORTED_SIZE: u64 = 64 * 1024 * 1024;
+    const HOST_RANGE_START: u64 = 0x8000_0000 + 64 * 1024 * 1024;
+    const HOST_RANGE_END: u64 = Self::HOST_RANGE_START + 2 * 64 * 1024 * 1024;
 
-    const BUFFERS_BASE_SIZE: u64 = 4096;
+    const SECURE_RANGE_START: u64 = 0x9000_0000;
+    const SECURE_RANGE_END: u64 = Self::SECURE_RANGE_START + 6 * 64 * 1024 * 1024;
 
-    const SECURE_BUFFER_1_BASE_ADDRESS: u64 = 0x9000_0000;
-    const SECURE_BUFFER_2_BASE_ADDRESS: u64 =
-        Self::SECURE_BUFFER_1_BASE_ADDRESS + Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE;
-    const SECURE_BUFFER_3_BASE_ADDRESS: u64 =
-        Self::SECURE_BUFFER_2_BASE_ADDRESS + Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE;
-    const SECURE_BUFFER_4_BASE_ADDRESS: u64 =
-        Self::SECURE_BUFFER_3_BASE_ADDRESS + Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE;
-    const SECURE_BUFFER_5_BASE_ADDRESS: u64 =
-        Self::SECURE_BUFFER_4_BASE_ADDRESS + Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE;
-    const SECURE_BUFFER_6_BASE_ADDRESS: u64 =
-        Self::SECURE_BUFFER_5_BASE_ADDRESS + Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE;
-    const SECURE_BUFFER_MAX_SUPPORTED_SIZE: u64 = 64 * 1024 * 1024;
+    const ALIGNMENT: u64 = 4096;
 
     fn new() -> Self {
-        let buffers = vec![
-            (Self::HOST_BUFFER_2_BASE_ADDRESS, Self::HOST_BUFFER_MAX_SUPPORTED_SIZE),
-            (Self::HOST_BUFFER_1_BASE_ADDRESS, Self::HOST_BUFFER_MAX_SUPPORTED_SIZE),
-        ];
-        let secure_buffers = vec![
-            (Self::SECURE_BUFFER_6_BASE_ADDRESS, Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE),
-            (Self::SECURE_BUFFER_5_BASE_ADDRESS, Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE),
-            (Self::SECURE_BUFFER_4_BASE_ADDRESS, Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE),
-            (Self::SECURE_BUFFER_3_BASE_ADDRESS, Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE),
-            (Self::SECURE_BUFFER_2_BASE_ADDRESS, Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE),
-            (Self::SECURE_BUFFER_1_BASE_ADDRESS, Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE),
-        ];
-        Self { buffers, secure_buffers }
-    }
-
-    fn get_buffer_max_size(protection_id: ProtectionId) -> Result<u64, MemShareError> {
-        match protection_id {
-            ProtectionId::HostBuffer => Ok(Self::HOST_BUFFER_MAX_SUPPORTED_SIZE),
-            ProtectionId::SecureDisplayFrameBuffer => Ok(Self::SECURE_BUFFER_MAX_SUPPORTED_SIZE),
-            _ => {
-                log::error!(
-                    "Only HostBuffer and SecureDisplayFrameBuffer are supported, received: {:?}",
-                    protection_id
-                );
-                Err(MemShareError::InvalidValue)
-            }
+        Self {
+            host_allocator: GapAllocator::new(Self::HOST_RANGE_START..Self::HOST_RANGE_END),
+            secure_allocator: GapAllocator::new(Self::SECURE_RANGE_START..Self::SECURE_RANGE_END),
         }
     }
 
-    fn get_buffer_reference(
+    fn get_allocator(
         &mut self,
         protection_id: ProtectionId,
-    ) -> Result<(u64, &mut Vec<(u64, u64)>), MemShareError> {
-        let max_supported_size = Self::get_buffer_max_size(protection_id)?;
+    ) -> Result<&mut GapAllocator, MemShareError> {
         match protection_id {
-            ProtectionId::HostBuffer => Ok((max_supported_size, &mut self.buffers)),
-            ProtectionId::SecureDisplayFrameBuffer => {
-                Ok((max_supported_size, &mut self.secure_buffers))
-            }
+            ProtectionId::HostBuffer => Ok(&mut self.host_allocator),
+            ProtectionId::SecureDisplayFrameBuffer => Ok(&mut self.secure_allocator),
             _ => {
-                log::error!(
-                    "Only HostBuffer and SecureDisplayFrameBuffer are supported, received: {:?}",
-                    protection_id
-                );
+                log::error!("Unsupported protection ID: {:?}", protection_id);
                 Err(MemShareError::InvalidValue)
             }
         }
@@ -173,24 +132,19 @@ impl MemoryManager {
         &mut self,
         protection_id: ProtectionId,
         base_address: u64,
-        size_bytes: u64,
+        _size_bytes: u64,
     ) -> Result<(), MemShareError> {
-        let (supported_size, buffers) = self.get_buffer_reference(protection_id)?;
-
-        if size_bytes > supported_size {
+        let allocator = self.get_allocator(protection_id)?;
+        if allocator.dealloc(base_address) {
+            Ok(())
+        } else {
             log::error!(
-                "add_area: Only buffers of size up to {} are supported, for protection id {:?}; received {}",
-                supported_size,
-                protection_id,
-                size_bytes
+                "Address {:#x} not found in allocator for {:?}",
+                base_address,
+                protection_id
             );
-            return Err(MemShareError::InvalidValue);
+            Err(MemShareError::InvalidState)
         }
-        // TODO: We need to check for overlaps with existing areas, overflow on the addresses,
-        //       and that base addresses match protection IDs
-        buffers.push((base_address, size_bytes));
-
-        Ok(())
     }
 
     fn get_map_area(
@@ -198,32 +152,23 @@ impl MemoryManager {
         size_bytes: i32,
         protection_id: ProtectionId,
     ) -> Result<(u64, u64), MemShareError> {
-        let (supported_size, buffers) = self.get_buffer_reference(protection_id)?;
+        if size_bytes <= 0 {
+            log::error!("size_bytes was not positive: {size_bytes}");
+            return Err(MemShareError::InvalidValue);
+        }
+        let size = size_bytes as u64;
+        if !size.is_multiple_of(Self::ALIGNMENT) {
+            log::error!("size must be multiple of {}, received {}", Self::ALIGNMENT, size);
+            return Err(MemShareError::InvalidValue);
+        }
 
-        if (size_bytes < 0) || (size_bytes as u64 > supported_size) {
-            log::error!(
-                "get_map_area: Only buffers of size up to {} are supported for protection ID {:?}, received {}",
-                supported_size,
-                protection_id,
-                size_bytes
-            );
-            return Err(MemShareError::InvalidValue);
+        let allocator = self.get_allocator(protection_id)?;
+        if let Some(start) = allocator.alloc(size, Self::ALIGNMENT) {
+            Ok((start, start + size))
+        } else {
+            log::error!("No space left for protection ID {:?}", protection_id);
+            Err(MemShareError::AllocationError)
         }
-        if !(size_bytes as u64).is_multiple_of(Self::BUFFERS_BASE_SIZE) {
-            log::error!(
-                "size must be multiple of {}, received {}",
-                Self::BUFFERS_BASE_SIZE,
-                size_bytes
-            );
-            return Err(MemShareError::InvalidValue);
-        }
-        if buffers.is_empty() {
-            log::error!("No more buffers available for pretection ID {:?}", protection_id);
-            return Err(MemShareError::AllocationError);
-        }
-        // buffer is not empty, so we can unwrap
-        let buffer = buffers.pop().unwrap();
-        Ok((buffer.0, buffer.0 + (size_bytes as u64)))
     }
 }
 
@@ -273,7 +218,6 @@ impl MemoryBufferContextData {
             remove_memory_mapping(dma_buffer_id)?;
         }
         if let Some(memory_range) = self.memory_range.take() {
-            let range_max_size = MemoryManager::get_buffer_max_size(memory_range.protection_id)?;
             // MemoryBufferContext are only created after MEMORY_MANAGER is initialized
             let memory_manager = MEMORY_MANAGER.get().ok_or_else(|| {
                 log::error!("Memory Manager was not available");
@@ -285,7 +229,11 @@ impl MemoryBufferContextData {
                     log::error!("found a poisoned memory_manager mutex on memory_manager");
                     MemShareError::InvalidState
                 })?
-                .add_area(memory_range.protection_id, memory_range.range_ipa_start, range_max_size)
+                .add_area(
+                    memory_range.protection_id,
+                    memory_range.range_ipa_start,
+                    memory_range.range_size,
+                )
                 .map_err(|e| {
                     log::error!(
                         "couldn't add area back: {:?} at address 0x{:x} of size {}",
