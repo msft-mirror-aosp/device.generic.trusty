@@ -249,17 +249,8 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     hypervisor.memory_share.supported=1 \
     ro.adb.secure=0 \
     ro.boot.vendor.apex.com.android.hardware.keymint=com.android.hardware.keymint.trusty_tee \
-    ro.boot.vendor.apex.com.android.hardware.gatekeeper=com.android.hardware.gatekeeper.trusty_tee \
-
-ifeq ($(TRUSTY_SYSTEM_VM), enabled_with_placeholder_trusted_hal)
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.boot.vendor.apex.com.android.hardware.security.see.hwcrypto=android.hardware.security.sharedsecret.security_vm_with_placeholder_thal
-
-else
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.boot.vendor.apex.com.android.hardware.security.see.hwcrypto=com.android.hardware.security.see.hwcrypto.trusty_tee.without_shared_secret \
-
-endif
+    ro.boot.vendor.apex.com.android.hardware.gatekeeper=com.android.hardware.gatekeeper.trusty_tee \
 
 PRODUCT_COPY_FILES += \
     system/core/rootdir/ramdisk_node_list:$(TARGET_COPY_OUT_RAMDISK)/ramdisk_node_list
