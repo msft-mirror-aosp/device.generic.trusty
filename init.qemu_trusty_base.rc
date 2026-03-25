@@ -23,7 +23,7 @@ com.android.hardware.keymint.trusty_system_vm
 
 on post-fs
     # Ensure rpmb_virt_device is ready and start storageproxyd
-    # (on-post-fs at the latest because vold
+    # on-post-fs at the latest because vold
     # needs secure storage for rollback protection
     # of the data partition encryption key
     wait /dev/vport/rpmb0
@@ -121,7 +121,7 @@ on property:qemu.logcat=start
     start goldfish-logcat
 
 # -Q is a special logcat option that forces the
-# program to check wether it runs on the emulator
+# program to check whether it runs on the emulator
 # if it does, it redirects its output to the device
 # named by the androidboot.console kernel option
 # if not, is simply exits immediately
