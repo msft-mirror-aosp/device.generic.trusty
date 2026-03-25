@@ -15,26 +15,27 @@
 //use rustutils::android::system_properties;
 use anyhow::{bail, ensure, Context, Result};
 use avf_bindgen::{
-    AVirtualMachine, AVirtualMachineRawConfig_create, AVirtualMachineRawConfig_setInstanceId,
-    AVirtualMachineRawConfig_setKernel, AVirtualMachineRawConfig_setMemoryMiB,
-    AVirtualMachineRawConfig_setName, AVirtualMachineRawConfig_setProtectedVm,
-    AVirtualMachine_addAccessor, AVirtualMachine_createRaw, AVirtualMachine_destroy,
-    AVirtualMachine_start, AVirtualizationService_create, AVirtualizationService_destroy,
+    AVirtualMachine, AVirtualMachineMemoryMappingAttributes, AVirtualMachineRawConfig_create,
+    AVirtualMachineRawConfig_setInstanceId, AVirtualMachineRawConfig_setKernel,
+    AVirtualMachineRawConfig_setMemoryMiB, AVirtualMachineRawConfig_setName,
+    AVirtualMachineRawConfig_setProtectedVm, AVirtualMachine_addAccessor,
+    AVirtualMachine_addMemoryMapping, AVirtualMachine_createRaw, AVirtualMachine_destroy,
+    AVirtualMachine_removeMemoryMapping, AVirtualMachine_start, AVirtualizationService_create,
+    AVirtualizationService_destroy,
 };
-use binder::{self, ProcessState};
+use binder::{self, ParcelFileDescriptor, ProcessState};
 use clap::Parser;
 use env_logger::Builder;
 use hypervisor_props::is_protected_vm_supported;
 use log::{info, warn, LevelFilter};
+use memshare_launcher::{self, MemShareError, MemShareVm};
 use serde::Deserialize;
 use std::ffi::CString;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::os::fd::{AsRawFd, IntoRawFd};
 use std::path::{Path, PathBuf};
-use std::sync::{Mutex, OnceLock};
-
-mod memshare_service;
+use std::sync::Mutex;
 
 struct AVMWrapper(*mut AVirtualMachine);
 
@@ -43,7 +44,48 @@ struct AVMWrapper(*mut AVirtualMachine);
 // *VmInstance which can be send between threads.
 unsafe impl Send for AVMWrapper {}
 
-pub(crate) static MEMSHARE_VM: OnceLock<Mutex<AVMWrapper>> = OnceLock::new();
+struct VendorMemShareVm(Mutex<AVMWrapper>);
+
+impl MemShareVm for VendorMemShareVm {
+    fn add_memory_mapping(
+        &self,
+        fd: &ParcelFileDescriptor,
+        range_ipa_start: u64,
+        range_ipa_end: u64,
+    ) -> Result<i32, MemShareError> {
+        let vm_obj = self
+            .0
+            .lock()
+            .map_err(|e| {
+                log::error!("Couldn't lock vm object: {:?}", e);
+                MemShareError::InvalidState
+            })?
+            .0;
+        // SAFETY: vm_obj is a valid pointer returned by AVirtualMachine_createRaw
+        let dma_buffer_id = unsafe {
+            AVirtualMachine_addMemoryMapping(vm_obj, fd.as_raw_fd(), range_ipa_start, range_ipa_end, 0, AVirtualMachineMemoryMappingAttributes::AVIRTUAL_MACHINE_MEMORY_MAPPING_ATTRIBUTE_CACHE_COHERENT)
+        };
+        Ok(dma_buffer_id)
+    }
+
+    fn remove_memory_mapping(&self, dma_buffer_id: i32) -> Result<(), MemShareError> {
+        let vm_obj = self
+            .0
+            .lock()
+            .map_err(|e| {
+                log::error!("Couldn't lock vm object: {:?}", e);
+                MemShareError::InvalidState
+            })?
+            .0;
+        // SAFETY: vm_obj is a valid pointer returned by AVirtualMachine_createRaw.
+        let mapping_removed = unsafe { AVirtualMachine_removeMemoryMapping(vm_obj, dma_buffer_id) };
+        if !mapping_removed {
+            log::error!("couldn't remove DMA buffer");
+            return Err(MemShareError::BufferMappingProblem);
+        };
+        Ok(())
+    }
+}
 
 const INSTANCE_ID_SIZE: usize = 64;
 #[derive(Parser, Debug)]
@@ -153,33 +195,25 @@ fn main() -> Result<()> {
         } == 0,
         "AVirtualMachine_createRaw failed"
     );
-    let _vm = MEMSHARE_VM.get_or_init(|| Mutex::new(AVMWrapper(vm)));
+
+    let vm_wrapper = VendorMemShareVm(Mutex::new(AVMWrapper(vm)));
+    memshare_launcher::set_vm_instance(Box::new(vm_wrapper))
+        .map_err(|_| anyhow::anyhow!("Failed to set VM instance for memshare"))?;
+
     scopeguard::defer! {
-        // SAFETY: vm_obj contains a valid pointer to AVirtualMachine
+        // SAFETY: vm contains a valid pointer to AVirtualMachine
         unsafe {
-            let vm_obj = MEMSHARE_VM
-                .get()
-                .expect("Should not happen, VM object has already been initialized")
-                .lock()
-                .expect("poisoned mutex, shouldn't happen on a singled threaded application")
-                .0;
-            AVirtualMachine_destroy(vm_obj);
+            AVirtualMachine_destroy(vm);
         }
     }
     info!("vm created");
-    {
-        let vm_obj = MEMSHARE_VM
-            .get()
-            .expect("Should not happen, VM object has already been initialized")
-            .lock()
-            .expect("poisoned mutex, shouldn't happen on a singled threaded application")
-            .0;
-        // SAFETY: vm_obj contains the only reference to a valid object
-        unsafe {
-            AVirtualMachine_start(vm_obj);
-        }
+
+    // SAFETY: vm contains the only reference to a valid object
+    unsafe {
+        AVirtualMachine_start(vm);
     }
     info!("VM started");
+
     ProcessState::start_thread_pool();
     if !args.rpc_services_config.is_empty() {
         for config_path in args.rpc_services_config {
@@ -201,31 +235,27 @@ fn main() -> Result<()> {
                     config.port
                 );
                 ensure!(
-                    {
-                        let vm_obj = MEMSHARE_VM
-                            .get()
-                            .expect("Should not happen, VM object has already been initialized")
-                            .lock()
-                            .expect("poisoned mutex, shouldn't happen on singled threaded app")
-                            .0;
-                        // SAFETY: vm_obj is a valid pointer returned by AVirtualMachine_createRaw.
-                        // rpc_service_name_cstr and accessor_name_cstr are valid null terminated C
-                        // strings.
-                        unsafe {
-                            AVirtualMachine_addAccessor(
-                                vm_obj,
-                                rpc_service_name_cstr.as_ptr(),
-                                accessor_name_cstr.as_ptr(),
-                                config.port,
-                            )
-                        }
+                    // SAFETY: vm is a valid pointer returned by AVirtualMachine_createRaw.
+                    // rpc_service_name_cstr and accessor_name_cstr are valid null terminated C
+                    // strings. `AVirtualMachine_addAccessor` safety preconditions do not ask for
+                    // the `CStrings`` to be available after the call. `Moreover`, because
+                    // `AVirtualMachine_addAccessor` internally transforms the `CStrings` inputs
+                    // into `&str` their usage should be limited to only the call timeframe.
+                    unsafe {
+                        AVirtualMachine_addAccessor(
+                            vm,
+                            rpc_service_name_cstr.as_ptr(),
+                            accessor_name_cstr.as_ptr(),
+                            config.port,
+                        )
                     } == 0,
                     "AVirtualMachine_addAccessor failed"
                 );
             }
         }
     }
-    memshare_service::register_memshare_service().context("Couldn't register memshare service")?;
+    memshare_launcher::memshare_service::register_memshare_service()
+        .context("Couldn't register memshare service")?;
     ProcessState::join_thread_pool();
     bail!("Thread pool unexpectedly ended");
 }

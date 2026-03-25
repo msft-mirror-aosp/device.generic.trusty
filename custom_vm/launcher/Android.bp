@@ -19,12 +19,30 @@ rust_defaults {
         "libserde",
         "libserde_json",
         "libthiserror",
+        "libmemshare_launcher",
     ],
     shared_libs: ["libavf"],
     enabled: true,
     apex_available: [
         "//apex_available:platform",
     ],
+}
+
+rust_library {
+    name: "libmemshare_launcher",
+    crate_name: "memshare_launcher",
+    srcs: ["src/lib.rs"],
+    edition: "2021",
+    rustlibs: [
+        "android.trusty.membuf-rust",
+        "libbinder_rs",
+        "liblog_rust",
+        "libthiserror",
+    ],
+    apex_available: [
+        "//apex_available:platform",
+    ],
+    vendor_available: true,
 }
 
 rust_binary {

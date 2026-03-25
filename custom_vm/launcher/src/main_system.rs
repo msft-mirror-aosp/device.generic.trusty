@@ -27,20 +27,49 @@ use clap::Parser;
 use env_logger::Builder;
 use hypervisor_props::is_protected_vm_supported;
 use log::{info, trace, warn, LevelFilter};
+use memshare_launcher::{self, MemShareError, MemShareVm};
 use nix::fcntl::OFlag;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
-use std::sync::OnceLock;
 use vmclient::VmInstance;
-
-mod memshare_service;
 
 const GUEST_FFA_TEE_SERVICE: &str = "guest_ffa_tee_service";
 const INSTANCE_ID_SIZE: usize = 64;
 
-pub(crate) static MEMSHARE_VM: OnceLock<VmInstance> = OnceLock::new();
+struct SystemMemShareVm(VmInstance);
+
+impl MemShareVm for SystemMemShareVm {
+    fn add_memory_mapping(
+        &self,
+        fd: &ParcelFileDescriptor,
+        range_ipa_start: u64,
+        range_ipa_end: u64,
+    ) -> Result<i32, MemShareError> {
+        let dup_fd = fd.as_ref().try_clone().map_err(|e| {
+            log::error!("Couldn't duplicate pfd: {:?}", e);
+            MemShareError::InvalidValue
+        })?;
+        let file = File::from(dup_fd);
+
+        match self.0.add_memory_mapping(file, range_ipa_start, range_ipa_end, 0, true) {
+            Ok(dma_buffer_id) => Ok(dma_buffer_id),
+            Err(e) => {
+                log::error!("Error received when mapping buffer: {:?}", e);
+                // Will return a negative number so caller will do cleanup before returning error
+                Ok(-1) // ERROR_MAPPING_MEMORY
+            }
+        }
+    }
+
+    fn remove_memory_mapping(&self, dma_buffer_id: i32) -> Result<(), MemShareError> {
+        self.0.remove_memory_mapping(dma_buffer_id).map_err(|e| {
+            log::error!("couldn't remove DMA buffer: {:?}", e);
+            MemShareError::BufferMappingProblem
+        })
+    }
+}
 
 #[derive(Parser, Debug)]
 /// Collection of CLI for trusty_security_vm_launcher
@@ -181,18 +210,17 @@ fn main() -> Result<()> {
     // Creates only one pipe and one thread for efficiency.
     let log_out = console_out.try_clone().context("Failed to clone console_out fd for log_out")?;
 
-    let vm = MEMSHARE_VM.get_or_init(|| {
-        VmInstance::create(
-            service.as_ref(),
-            &vm_config,
-            // console_in, console_out, and log will be redirected to the kernel log by virtmgr
-            Some(console_out),
-            None, // console_in
-            Some(log_out),
-            None, // dump_dt
-        )
-        .expect("Failed to create VM")
-    });
+    let vm = VmInstance::create(
+        service.as_ref(),
+        &vm_config,
+        // console_in, console_out, and log will be redirected to the kernel log by virtmgr
+        Some(console_out),
+        None, // console_in
+        Some(log_out),
+        None, // dump_dt
+    )
+    .expect("Failed to create VM");
+
     vm.start(None /* callback */).context("Failed to start VM")?;
     info!("started VM");
 
@@ -204,11 +232,15 @@ fn main() -> Result<()> {
 
         info!("Registering {} RPC service(s) from {}...", configs.len(), config_path.display());
         for config in &configs {
-            register_accessor_service(vm, config)?;
+            register_accessor_service(&vm, config)?;
         }
     }
 
-    memshare_service::register_memshare_service().context("Couldn't register memshare service")?;
+    memshare_launcher::set_vm_instance(Box::new(SystemMemShareVm(vm)))
+        .map_err(|_| anyhow::anyhow!("Failed to set VM instance for memshare"))?;
+
+    memshare_launcher::memshare_service::register_memshare_service()
+        .context("Couldn't register memshare service")?;
 
     ProcessState::join_thread_pool();
     bail!("Thread pool unexpectedly ended");
