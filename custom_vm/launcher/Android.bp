@@ -1,5 +1,6 @@
 package {
     default_applicable_licenses: ["Android-Apache-2.0"],
+    default_team: "trendy_team_trusty",
 }
 
 rust_defaults {
@@ -43,6 +44,15 @@ rust_library {
         "//apex_available:platform",
     ],
     vendor_available: true,
+    host_supported: true,
+}
+
+rust_test_host {
+    name: "libmemshare_launcher_test",
+    crate_name: "memshare_launcher_test",
+    srcs: ["src/allocator.rs"],
+    test_suites: ["general-tests"],
+    edition: "2021",
 }
 
 rust_binary {
